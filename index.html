@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Voice Agent Bookings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #eef2f6;
+            --card: #fff;
+            --ink: #14212e;
+            --mute: #5d6b7a;
+            --line: #d9e0e8;
+            --in: #0f6fb8;
+            --out: #b8560f;
+            --ok: #12805c;
+            --no: #8a94a0;
+            --okbg: #dff3ea;
+            --nobg: #eceff2;
+            --inbg: #dcecf8;
+            --outbg: #f9e8da;
+            --warn: #a4321a;
+            --warnbg: #fbe6e0;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0e1620;
+                --card: #16222f;
+                --ink: #e6edf4;
+                --mute: #93a1b0;
+                --line: #26364a;
+                --in: #5db2f0;
+                --out: #f0a05d;
+                --ok: #4fd1a0;
+                --no: #93a1b0;
+                --okbg: #12342a;
+                --nobg: #212e3c;
+                --inbg: #12304a;
+                --outbg: #402a15;
+                --warn: #f0806a;
+                --warnbg: #3a1c16
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #0e1620;
+            --card: #16222f;
+            --ink: #e6edf4;
+            --mute: #93a1b0;
+            --line: #26364a;
+            --in: #5db2f0;
+            --out: #f0a05d;
+            --ok: #4fd1a0;
+            --no: #93a1b0;
+            --okbg: #12342a;
+            --nobg: #212e3c;
+            --inbg: #12304a;
+            --outbg: #402a15;
+            --warn: #f0806a;
+            --warnbg: #3a1c16
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font: 400 15px/1.5 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif
+        }
+
+        main {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 20px 16px 40px
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: 700
+        }
+
+        .sub {
+            color: var(--mute);
+            font-size: 13px;
+            margin: 2px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ok);
+            display: inline-block
+        }
+
+        .dot.bad {
+            background: var(--warn)
+        }
+
+        button,
+        select,
+        input {
+            font: inherit;
+            color: var(--ink)
+        }
+
+        .btn {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 14px;
+            cursor: pointer
+        }
+
+        .btn:hover {
+            border-color: var(--mute)
+        }
+
+        .btn:focus-visible,
+        select:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--in);
+            outline-offset: 2px
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px
+        }
+
+        .stat {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px
+        }
+
+        .stat b {
+            display: block;
+            font-size: 26px;
+            line-height: 1.2
+        }
+
+        .stat span {
+            color: var(--mute);
+            font-size: 13px
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px
+        }
+
+        .filters input,
+        .filters select {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px
+        }
+
+        .filters input {
+            flex: 1;
+            min-width: 180px
+        }
+
+        .wrap {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow-x: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 760px
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap
+        }
+
+        th {
+            font-size: 13px;
+            color: var(--mute);
+            font-weight: 500
+        }
+
+        tr:last-child td {
+            border-bottom: 0
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 500
+        }
+
+        .in {
+            background: var(--inbg);
+            color: var(--in)
+        }
+
+        .out {
+            background: var(--outbg);
+            color: var(--out)
+        }
+
+        .yes {
+            background: var(--okbg);
+            color: var(--ok)
+        }
+
+        .nob {
+            background: var(--nobg);
+            color: var(--no)
+        }
+
+        .num {
+            font-variant-numeric: tabular-nums
+        }
+
+        .empty,
+        .err {
+            padding: 28px;
+            text-align: center;
+            color: var(--mute)
+        }
+
+        .err {
+            color: var(--warn)
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <header>
+            <div>
+                <h1>Voice agent bookings</h1>
+                <p class="sub"><span class="dot" id="dot"></span><span id="src">Connecting…</span></p>
+            </div>
+            <button class="btn" id="refresh">Refresh now</button>
+        </header>
+
+        <section class="stats" id="stats"></section>
+
+        <div class="filters">
+            <input id="q" type="search" placeholder="Search name or phone number"
+                aria-label="Search name or phone number">
+            <select id="dir" aria-label="Call direction">
+                <option value="">All calls</option>
+                <option value="inbound">Inbound</option>
+                <option value="outbound">Outbound</option>
+            </select>
+            <select id="bk" aria-label="Booking status">
+                <option value="">Booked and not booked</option>
+                <option value="yes">Booked</option>
+                <option value="no">Not booked</option>
+            </select>
+        </div>
+
+        <div class="wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Caller</th>
+                        <th>Phone number</th>
+                        <th>Direction</th>
+                        <th>Call time</th>
+                        <th>Duration</th>
+                        <th>Booking</th>
+                        <th>Appt. date</th>
+                        <th>Time slot</th>
+                    </tr>
+                </thead>
+                <tbody id="body"></tbody>
+            </table>
+            <div class="empty" id="empty" hidden>No calls yet.</div>
+            <div class="err" id="errbox" hidden></div>
+        </div>
+    </main>
+
+    <script>
+        var $ = function (id) { return document.getElementById(id) };
+        var calls = [];
+        var POLL_MS = 5000;
+
+        function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] }) }
+        function fmtDur(s) { s = +s || 0; return Math.floor(s / 60) + "m " + String(s % 60).padStart(2, "0") + "s" }
+
+        function stats(list) {
+            var t = list.length, b = list.filter(function (c) { return c.booked === "yes" }).length;
+            var i = list.filter(function (c) { return c.direction === "inbound" }).length, o = t - i;
+            function pct(a, n) { return n ? Math.round(a / n * 100) : 0 }
+            $("stats").innerHTML = [["Total calls", t], ["Appointments booked", b], ["Booking rate", pct(b, t) + "%"], ["Inbound", i], ["Outbound", o]]
+                .map(function (s) { return '<div class="stat"><b class="num">' + s[1] + '</b><span>' + s[0] + '</span></div>' }).join("");
+        }
+
+        function render() {
+            var q = $("q").value.toLowerCase().trim(), d = $("dir").value, k = $("bk").value;
+            var list = calls.filter(function (c) {
+                return (!d || c.direction === d) && (!k || c.booked === k) && (!q || (c.name + " " + c.phone).toLowerCase().indexOf(q) > -1)
+            });
+            stats(calls);
+            $("body").innerHTML = list.map(function (c) {
+                var y = c.booked === "yes";
+                return '<tr><td>' + esc(c.name) + '</td><td class="num">' + esc(c.phone) + '</td>' +
+                    '<td><span class="tag ' + (c.direction === "inbound" ? "in" : "out") + '">' + (c.direction === "inbound" ? "Inbound" : "Outbound") + '</span></td>' +
+                    '<td class="num">' + esc(c.call_time) + '</td><td class="num">' + fmtDur(c.duration_sec) + '</td>' +
+                    '<td><span class="tag ' + (y ? "yes" : "nob") + '">' + (y ? "Booked" : "Not booked") + '</span></td>' +
+                    '<td class="num">' + esc(c.appointment_date || "–") + '</td><td class="num">' + esc(c.appointment_time || "–") + '</td></tr>'
+            }).join("");
+            $("empty").hidden = list.length > 0;
+        }
+
+        async function poll() {
+            try {
+                var res = await fetch("/api/calls", { cache: "no-store" });
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                calls = await res.json();
+                $("dot").className = "dot";
+                $("src").textContent = "Live — " + calls.length + " calls — updated " + new Date().toLocaleTimeString();
+                $("errbox").hidden = true;
+                render();
+            } catch (err) {
+                $("dot").className = "dot bad";
+                $("src").textContent = "Connection issue, retrying…";
+                $("errbox").hidden = false;
+                $("errbox").textContent = "Couldn't reach the server: " + err.message;
+            }
+        }
+
+        ["q", "dir", "bk"].forEach(function (id) { $(id).addEventListener("input", render) });
+        $("refresh").addEventListener("click", poll);
+        poll();
+        setInterval(poll, POLL_MS);
+    </script>
+</body>
+
+</html>

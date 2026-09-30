@@ -1,0 +1,17 @@
+{
+  "name": "voice-agent-dashboard",
+  "version": "1.0.0",
+  "description": "Live dashboard for voice agent call history and appointment bookings, backed by MongoDB.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongodb": "^6.8.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
