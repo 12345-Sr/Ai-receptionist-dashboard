@@ -22,8 +22,9 @@ const PORT = process.env.PORT || 3001;
 const BACKEND_API_URL = process.env.BACKEND_API_URL
   ? process.env.BACKEND_API_URL.replace(/\/+$/, "")
   : null;
+const BACKEND_API_KEY = process.env.BACKEND_API_KEY || process.env.DASHBOARD_API_KEY || null;
 const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = process.env.DB_NAME || "test";
+const DB_NAME = process.env.DB_NAME || "ai_receptionist";
 const COLLECTION_NAME = process.env.COLLECTION_NAME || "calllogs";
 const DASH_USER = process.env.DASH_USER || "admin";
 const DASH_PASS = process.env.DASH_PASS || "changeme";
@@ -145,14 +146,20 @@ app.get("/api/calls", async (req, res) => {
   // 1. If BACKEND_API_URL is configured, fetch directly from Render backend API
   if (BACKEND_API_URL) {
     try {
+      const headers = {};
+      if (BACKEND_API_KEY) {
+        headers["X-API-Key"] = BACKEND_API_KEY;
+      }
       const backendRes = await fetch(`${BACKEND_API_URL}/api/calls`, {
+        headers,
         signal: AbortSignal.timeout(5000),
       });
       if (backendRes.ok) {
         const data = await backendRes.json();
         return res.json(data);
       }
-      console.warn(`[dashboard] Backend API error: ${backendRes.status}`);
+      const errText = await backendRes.text().catch(() => "");
+      console.warn(`[dashboard] Backend API error: ${backendRes.status} ${errText}`);
     } catch (err) {
       console.warn("[dashboard] Could not fetch from BACKEND_API_URL:", err.message);
     }
