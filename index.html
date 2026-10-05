@@ -4,105 +4,115 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Patient Bookings</title>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>AI Receptionist — Patient Call Records & Bookings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #eef2f6;
-            --card: #fff;
-            --ink: #14212e;
-            --mute: #5d6b7a;
-            --line: #d9e0e8;
-            --in: #0f6fb8;
-            --out: #b8560f;
-            --ok: #12805c;
-            --no: #8a94a0;
-            --okbg: #dff3ea;
-            --nobg: #eceff2;
-            --inbg: #dcecf8;
-            --outbg: #f9e8da;
-            --warn: #a4321a;
-            --agent: #eef3fb;
-            --user: #eef8f3;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --card-subtle: #f8fafc;
+            --ink: #0f172a;
+            --mute: #64748b;
+            --line: #e2e8f0;
+            --line-subtle: #edf2f7;
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --in: #0284c7;
+            --inbg: #e0f2fe;
+            --out: #d97706;
+            --outbg: #fef3c7;
+            --ok: #059669;
+            --okbg: #d1fae5;
+            --no: #64748b;
+            --nobg: #f1f5f9;
+            --warn: #dc2626;
+            --agent-bg: #f0f7ff;
+            --agent-border: #bfdbfe;
+            --user-bg: #ecfdf5;
+            --user-border: #a7f3d0;
             box-sizing: border-box;
             padding-top: env(safe-area-inset-top, 0px);
-            padding-bottom: env(safe-area-inset-bottom, 0px)
+            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
-        @media (prefers-color-scheme:dark) {
+        @media (prefers-color-scheme: dark) {
             :root:not([data-theme="light"]) {
-                --bg: #0e1620;
-                --card: #16222f;
-                --ink: #e6edf4;
-                --mute: #93a1b0;
-                --line: #26364a;
-                --in: #5db2f0;
-                --out: #f0a05d;
-                --ok: #4fd1a0;
-                --no: #93a1b0;
-                --okbg: #12342a;
-                --nobg: #212e3c;
-                --inbg: #12304a;
-                --outbg: #402a15;
-                --warn: #f0806a;
-                --agent: #18283a;
-                --user: #17302a
+                --bg: #0b1120;
+                --card: #131d31;
+                --card-subtle: #18243c;
+                --ink: #f1f5f9;
+                --mute: #94a3b8;
+                --line: #22324e;
+                --line-subtle: #1a283e;
+                --primary: #3b82f6;
+                --primary-light: #1e293b;
+                --in: #38bdf8;
+                --inbg: #0c2d48;
+                --out: #fbbf24;
+                --outbg: #3d2a0a;
+                --ok: #34d399;
+                --okbg: #064e3b;
+                --no: #94a3b8;
+                --nobg: #1e293b;
+                --warn: #f87171;
+                --agent-bg: #13243a;
+                --agent-border: #1e3a63;
+                --user-bg: #0d2822;
+                --user-border: #134e42;
             }
         }
 
-        :root[data-theme="dark"] {
-            --bg: #0e1620;
-            --card: #16222f;
-            --ink: #e6edf4;
-            --mute: #93a1b0;
-            --line: #26364a;
-            --in: #5db2f0;
-            --out: #f0a05d;
-            --ok: #4fd1a0;
-            --no: #93a1b0;
-            --okbg: #12342a;
-            --nobg: #212e3c;
-            --inbg: #12304a;
-            --outbg: #402a15;
-            --warn: #f0806a;
-            --agent: #18283a;
-            --user: #17302a
-        }
-
-        html {
-            scroll-padding-top: env(safe-area-inset-top, 0px)
-        }
-
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
             margin: 0;
             background: var(--bg);
             color: var(--ink);
-            font: 400 15px/1.5 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif
+            font: 400 14px/1.5 "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         main {
-            max-width: 860px;
+            max-width: 980px;
             margin: 0 auto;
-            padding: 20px 16px 40px
+            padding: 24px 20px 60px;
         }
 
         header {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px
+            margin-bottom: 20px;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2563eb, #0284c7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
         h1 {
             font-size: 22px;
             margin: 0;
-            font-weight: 700
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
 
         .sub {
@@ -111,7 +121,7 @@
             margin: 2px 0 0;
             display: flex;
             align-items: center;
-            gap: 6px
+            gap: 8px;
         }
 
         .dot {
@@ -120,272 +130,493 @@
             border-radius: 50%;
             background: var(--ok);
             display: inline-block;
-            flex: none
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+            animation: pulse 2s infinite;
         }
 
         .dot.bad {
-            background: var(--warn)
+            background: var(--warn);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+            animation: none;
         }
 
-        button,
-        input {
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.95); }
+        }
+
+        button, input {
             font: inherit;
-            color: var(--ink)
+            color: var(--ink);
         }
 
         .btn {
             background: var(--card);
             border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 8px 14px;
-            cursor: pointer
+            border-radius: 9px;
+            padding: 9px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
         }
 
         .btn:hover {
-            border-color: var(--mute)
+            border-color: var(--mute);
+            background: var(--card-subtle);
         }
 
-        .btn:focus-visible,
-        input:focus-visible,
-        .nameBtn:focus-visible {
-            outline: 2px solid var(--in);
-            outline-offset: 2px
+        .search-bar {
+            position: relative;
+            margin-bottom: 16px;
         }
 
-        input {
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--mute);
+            pointer-events: none;
+            font-size: 15px;
+        }
+
+        input[type="search"] {
             background: var(--card);
             border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 9px 12px;
+            border-radius: 10px;
+            padding: 12px 14px 12px 40px;
             width: 100%;
-            margin-bottom: 12px
+            font-size: 14px;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        input[type="search"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         .wrap {
             background: var(--card);
             border: 1px solid var(--line);
-            border-radius: 10px;
-            overflow-x: auto
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 480px
+            min-width: 580px;
         }
 
-        th,
-        td {
+        th, td {
             text-align: left;
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--line);
-            white-space: nowrap
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--line-subtle);
+            white-space: nowrap;
         }
 
         th {
-            font-size: 13px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             color: var(--mute);
-            font-weight: 500
+            font-weight: 700;
+            background: var(--card-subtle);
+        }
+
+        tr.callRow {
+            cursor: pointer;
+            transition: background 0.12s ease;
+        }
+
+        tr.callRow:hover {
+            background: var(--primary-light);
         }
 
         tr:last-child td {
-            border-bottom: 0
+            border-bottom: 0;
         }
 
-        .nameBtn {
-            background: none;
-            border: 0;
-            padding: 0;
-            color: var(--in);
+        .patient-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            color: #3730a3;
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .patient-name {
             font-weight: 600;
-            cursor: pointer;
-            font-size: 15px;
-            text-align: left
-        }
-
-        .nameBtn:hover {
-            text-decoration: underline
+            color: var(--primary);
+            font-size: 14px;
         }
 
         .num {
-            font-variant-numeric: tabular-nums
+            font-variant-numeric: tabular-nums;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 13px;
         }
 
-        .empty,
-        .err {
-            padding: 28px;
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .tag.in { background: var(--inbg); color: var(--in); }
+        .tag.out { background: var(--outbg); color: var(--out); }
+        .tag.yes { background: var(--okbg); color: var(--ok); }
+        .tag.nob { background: var(--nobg); color: var(--no); }
+
+        .empty, .err {
+            padding: 36px 20px;
             text-align: center;
-            color: var(--mute)
+            color: var(--mute);
         }
 
         .err {
-            color: var(--warn)
+            color: var(--warn);
+            background: #fee2e2;
+            margin: 12px 0;
+            border-radius: 8px;
         }
 
-        /* detail overlay */
+        /* ================= DETAIL MODAL OVERLAY ================= */
         .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(10, 16, 24, .45);
-            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            display: none; /* Crucial: none by default */
             align-items: flex-end;
             justify-content: center;
-            z-index: 50
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
-        @media (min-width:640px) {
+        .overlay.open {
+            display: flex;
+        }
+
+        .overlay[hidden] {
+            display: none !important;
+        }
+
+        @media (min-width: 640px) {
             .overlay {
-                align-items: center
+                align-items: center;
+                padding: 20px;
             }
         }
 
         .panel {
             background: var(--card);
             width: 100%;
-            max-width: 560px;
-            max-height: 88vh;
-            border-radius: 14px 14px 0 0;
+            max-width: 640px;
+            max-height: 90vh;
+            border-radius: 16px 16px 0 0;
             display: flex;
             flex-direction: column;
-            overflow: hidden
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--line);
+            animation: slideUp 0.22s ease-out;
         }
 
-        @media (min-width:640px) {
+        @media (min-width: 640px) {
             .panel {
-                border-radius: 14px
+                border-radius: 16px;
             }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .pHead {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 12px;
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--line)
+            gap: 16px;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--line);
+            background: var(--card-subtle);
+        }
+
+        .pHead-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .avatar-large {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #0284c7);
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+            flex-shrink: 0;
         }
 
         .pHead h2 {
-            margin: 0 0 4px;
-            font-size: 18px
-        }
-
-        .pHead p {
             margin: 0;
-            color: var(--mute);
-            font-size: 13px
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
         }
 
-        .close {
+        .pHead-phone {
+            margin: 2px 0 6px;
+            color: var(--mute);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pHead-phone a {
+            color: var(--primary);
+            text-decoration: none;
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 600;
+        }
+
+        .pHead-phone a:hover {
+            text-decoration: underline;
+        }
+
+        .badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .close-btn {
             background: none;
             border: 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
             font-size: 20px;
             line-height: 1;
             cursor: pointer;
             color: var(--mute);
-            padding: 4px
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .close-btn:hover {
+            background: var(--line);
+            color: var(--ink);
         }
 
         .pBody {
-            padding: 16px 20px;
-            overflow-y: auto
+            padding: 20px 22px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-section {
+            background: var(--card-subtle);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--mute);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
         }
 
         .grid2 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px 16px;
-            margin-bottom: 16px
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
         }
 
-        .field span {
-            display: block;
-            color: var(--mute);
-            font-size: 12px
-        }
-
-        .field b {
-            font-size: 14px
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 99px;
-            font-size: 12px;
-            font-weight: 500
-        }
-
-        .in {
-            background: var(--inbg);
-            color: var(--in)
-        }
-
-        .out {
-            background: var(--outbg);
-            color: var(--out)
-        }
-
-        .yes {
-            background: var(--okbg);
-            color: var(--ok)
-        }
-
-        .nob {
-            background: var(--nobg);
-            color: var(--no)
-        }
-
-        .sectionTitle {
-            font-size: 13px;
-            color: var(--mute);
-            margin: 0 0 8px;
-            font-weight: 500
-        }
-
-        .summary {
-            background: var(--nobg);
+        .field-box {
+            background: var(--card);
+            border: 1px solid var(--line-subtle);
             border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 14px;
-            margin-bottom: 16px
-        }
-
-        .chat {
-            display: flex;
-            flex-direction: column;
-            gap: 8px
-        }
-
-        .bubble {
-            max-width: 82%;
             padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 14px
         }
 
-        .bubble.agent {
-            background: var(--agent);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px
-        }
-
-        .bubble.user {
-            background: var(--user);
-            align-self: flex-end;
-            border-bottom-right-radius: 4px
-        }
-
-        .bubble small {
+        .field-box span {
             display: block;
             color: var(--mute);
             font-size: 11px;
-            margin-bottom: 2px
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .field-box b {
+            font-size: 13.5px;
+            color: var(--ink);
+            word-break: break-word;
+        }
+
+        .summary-box {
+            background: var(--card);
+            border-left: 3px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 14px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: var(--ink);
+        }
+
+        /* ================= CHAT TRANSCRIPT BUBBLES ================= */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding: 10px 4px;
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .chat-bubble.agent {
+            background: var(--agent-bg);
+            border: 1px solid var(--agent-border);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-bubble.user {
+            background: var(--user-bg);
+            border: 1px solid var(--user-border);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bubble-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--mute);
+            margin-bottom: 4px;
+        }
+
+        .bubble-role {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chat-bubble.agent .bubble-role {
+            color: var(--primary);
+        }
+
+        .chat-bubble.user .bubble-role {
+            color: var(--ok);
         }
 
         .noChat {
             color: var(--mute);
-            font-size: 14px
+            font-size: 13px;
+            font-style: italic;
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        /* ================= LINKED CALLS TIMELINE ================= */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .history-item {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .history-item:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .history-item.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            font-weight: 600;
+        }
+
+        .history-item span {
+            font-size: 12px;
+            color: var(--mute);
         }
     </style>
 </head>
@@ -393,102 +624,337 @@
 <body>
     <main>
         <header>
-            <div>
-                <h1>Patient bookings</h1>
-                <p class="sub"><span class="dot" id="dot"></span><span id="src">Connecting…</span></p>
+            <div class="brand-title">
+                <div class="brand-icon">🏥</div>
+                <div>
+                    <h1>Patient Call Records & Bookings</h1>
+                    <p class="sub">
+                        <span class="dot" id="dot"></span>
+                        <span id="src">Connecting to live feed…</span>
+                    </p>
+                </div>
             </div>
-            <button class="btn" id="refresh">Refresh now</button>
+            <button class="btn" id="refresh">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                Refresh Now
+            </button>
         </header>
 
-        <input id="q" type="search" placeholder="Search name or phone number" aria-label="Search name or phone number">
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input id="q" type="search" placeholder="Search patient name, phone number, doctor, or keyword…" aria-label="Search">
+        </div>
 
         <div class="wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Phone number</th>
-                        <th>Date</th>
-                        <th>Time slot</th>
+                        <th>Patient Name</th>
+                        <th>Phone Number</th>
+                        <th>Direction</th>
+                        <th>Call Time</th>
+                        <th>Booking Status</th>
+                        <th>Appointment Date & Time</th>
                     </tr>
                 </thead>
                 <tbody id="body"></tbody>
             </table>
-            <div class="empty" id="empty" hidden>No bookings yet.</div>
+            <div class="empty" id="empty" hidden>No matching patient records found.</div>
             <div class="err" id="errbox" hidden></div>
         </div>
     </main>
 
+    <!-- Patient Complete Record Slide-Over / Modal -->
     <div class="overlay" id="overlay" hidden>
         <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pName">
             <div class="pHead">
-                <div>
-                    <h2 id="pName">—</h2>
-                    <p id="pPhone">—</p>
+                <div class="pHead-info">
+                    <div class="avatar-large" id="pAvatar">?</div>
+                    <div>
+                        <h2 id="pName">—</h2>
+                        <div class="pHead-phone">
+                            <span>📞</span>
+                            <a id="pPhone" href="#">—</a>
+                        </div>
+                        <div class="badges-row" id="pBadges"></div>
+                    </div>
                 </div>
-                <button class="close" id="closeBtn" aria-label="Close">✕</button>
+                <button class="close-btn" id="closeBtn" aria-label="Close modal">✕</button>
             </div>
+
             <div class="pBody">
-                <div class="grid2" id="pGrid"></div>
-                <p class="sectionTitle">Call summary</p>
-                <div class="summary" id="pSummary"></div>
-                <p class="sectionTitle">Conversation with AI</p>
-                <div class="chat" id="pChat"></div>
+                <!-- Appointment Info Card -->
+                <div class="card-section" id="apptCard">
+                    <div class="section-header">
+                        <p class="section-title">📅 Appointment Booking Record</p>
+                        <span id="apptStatusBadge"></span>
+                    </div>
+                    <div class="grid2" id="pApptGrid"></div>
+                </div>
+
+                <!-- Call Metadata Card -->
+                <div class="card-section">
+                    <div class="section-header">
+                        <p class="section-title">🎙️ Call & Telephony Details</p>
+                    </div>
+                    <div class="grid2" id="pCallGrid"></div>
+                </div>
+
+                <!-- Summary Card -->
+                <div class="card-section">
+                    <div class="section-header">
+                        <p class="section-title">📝 AI Call Summary</p>
+                    </div>
+                    <div class="summary-box" id="pSummary"></div>
+                </div>
+
+                <!-- Conversation with AI Assistant -->
+                <div class="card-section">
+                    <div class="section-header">
+                        <p class="section-title">💬 Full AI Conversation Transcript</p>
+                        <span class="tag nob" id="turnsCount">0 turns</span>
+                    </div>
+                    <div class="chat-container" id="pChat"></div>
+                </div>
+
+                <!-- Multi-call history if this number called more than once -->
+                <div class="card-section" id="historyCard" style="display:none;">
+                    <div class="section-header">
+                        <p class="section-title">📞 Other Calls From This Number</p>
+                        <span class="tag in" id="historyCount">0 calls</span>
+                    </div>
+                    <div class="history-list" id="pHistory"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        var $ = function (id) { return document.getElementById(id) };
+        var $ = function (id) { return document.getElementById(id); };
         var calls = [];
+        var activeCallId = null;
         var POLL_MS = 5000;
 
-        function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] }) }
-        function fmtDur(s) { s = +s || 0; return Math.floor(s / 60) + "m " + String(s % 60).padStart(2, "0") + "s" }
+        function esc(s) {
+            return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+                return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+            });
+        }
+
+        function fmtDur(s) {
+            s = +s || 0;
+            var m = Math.floor(s / 60);
+            var sec = s % 60;
+            return m > 0 ? (m + "m " + String(sec).padStart(2, "0") + "s") : (sec + "s");
+        }
+
+        function getInitials(name) {
+            if (!name) return "P";
+            var parts = name.trim().split(/\s+/);
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return name.slice(0, 2).toUpperCase();
+        }
+
+        function cleanPhone(p) {
+            if (!p) return "";
+            return String(p).replace(/\D/g, "").slice(-10);
+        }
 
         function render() {
             var q = $("q").value.toLowerCase().trim();
             var list = calls.filter(function (c) {
-                return !q || ((c.name || "") + " " + (c.phone || "")).toLowerCase().indexOf(q) > -1;
+                if (!q) return true;
+                var haystack = [
+                    c.name || "",
+                    c.phone || "",
+                    c.appointment_date || "",
+                    c.appointment_time || "",
+                    c.notes || "",
+                    c.callSid || ""
+                ].join(" ").toLowerCase();
+                return haystack.indexOf(q) > -1;
             });
+
             $("body").innerHTML = list.map(function (c, i) {
-                return '<tr><td><button class="nameBtn" data-i="' + i + '">' + esc(c.name || "Unknown") + '</button></td>' +
-                    '<td class="num">' + esc(c.phone) + '</td>' +
-                    '<td class="num">' + esc(c.appointment_date || "–") + '</td>' +
-                    '<td class="num">' + esc(c.appointment_time || "–") + '</td></tr>';
+                var isBooked = c.booked === "yes";
+                var isInbound = (c.direction || "inbound").toLowerCase().startsWith("in");
+                var apptStr = "—";
+                if (c.appointment_date && c.appointment_date !== "—") {
+                    apptStr = esc(c.appointment_date) + (c.appointment_time && c.appointment_time !== "—" ? (" at " + esc(c.appointment_time)) : "");
+                } else if (c.appointment_time && c.appointment_time !== "—") {
+                    apptStr = esc(c.appointment_time);
+                }
+
+                return '<tr class="callRow" data-id="' + esc(c.id) + '">' +
+                    '<td><div class="patient-cell">' +
+                        '<div class="avatar-circle">' + esc(getInitials(c.name)) + '</div>' +
+                        '<div><span class="patient-name">' + esc(c.name || "Unknown Patient") + '</span></div>' +
+                    '</div></td>' +
+                    '<td class="num">' + esc(c.phone || "—") + '</td>' +
+                    '<td><span class="tag ' + (isInbound ? "in" : "out") + '">' + (isInbound ? "📥 Inbound" : "📤 Outbound") + '</span></td>' +
+                    '<td class="num">' + esc(c.call_time || "—") + '</td>' +
+                    '<td><span class="tag ' + (isBooked ? "yes" : "nob") + '">' + (isBooked ? "✓ Booked" : "No Booking") + '</span></td>' +
+                    '<td>' + apptStr + '</td>' +
+                '</tr>';
             }).join("");
+
             $("empty").hidden = list.length > 0;
-            Array.prototype.forEach.call(document.querySelectorAll(".nameBtn"), function (btn) {
-                btn.addEventListener("click", function () { openDetail(list[+btn.dataset.i]); });
+
+            // Bind click handlers to whole row and name
+            Array.prototype.forEach.call(document.querySelectorAll(".callRow"), function (row) {
+                row.addEventListener("click", function () {
+                    var id = row.getAttribute("data-id");
+                    var matched = calls.find(function (x) { return String(x.id) === String(id); });
+                    if (matched) {
+                        openDetail(matched);
+                    }
+                });
             });
         }
 
         function openDetail(c) {
-            $("pName").textContent = c.name || "Unknown";
-            $("pPhone").textContent = c.phone || "No number";
-            var y = c.booked === "yes";
-            $("pGrid").innerHTML = [
-                ["Direction", '<span class="tag ' + (c.direction === "inbound" ? "in" : "out") + '">' + (c.direction === "inbound" ? "Inbound" : "Outbound") + '</span>'],
-                ["Booking", '<span class="tag ' + (y ? "yes" : "nob") + '">' + (y ? "Booked" : "Not booked") + '</span>'],
-                ["Call time", esc(c.call_time || "–")],
-                ["Duration", fmtDur(c.duration_sec)],
-                ["Appointment date", esc(c.appointment_date || "–")],
-                ["Time slot", esc(c.appointment_time || "–")]
-            ].map(function (f) { return '<div class="field"><span>' + f[0] + '</span><b>' + f[1] + '</b></div>'; }).join("");
-            $("pSummary").textContent = c.notes || "No summary recorded for this call.";
+            if (!c) return;
+            activeCallId = c.id;
+
+            var name = c.name || "Unknown Patient";
+            var phone = c.phone || "No phone number";
+            var isBooked = c.booked === "yes";
+            var isInbound = (c.direction || "inbound").toLowerCase().startsWith("in");
+
+            $("pAvatar").textContent = getInitials(name);
+            $("pName").textContent = name;
+            $("pPhone").textContent = phone;
+            $("pPhone").href = phone !== "No phone number" ? ("tel:" + phone) : "#";
+
+            // Badges in Header
+            $("pBadges").innerHTML = [
+                '<span class="tag ' + (isBooked ? "yes" : "nob") + '">' + (isBooked ? "✓ Appointment Confirmed" : "No Appointment Booked") + '</span>',
+                '<span class="tag ' + (isInbound ? "in" : "out") + '">' + (isInbound ? "📥 Inbound Call" : "📤 Outbound Call") + '</span>',
+                '<span class="tag nob">⏱️ ' + fmtDur(c.duration_sec) + '</span>',
+                c.status ? ('<span class="tag nob">Status: ' + esc(c.status) + '</span>') : ''
+            ].join("");
+
+            // Appointment Grid
+            $("apptStatusBadge").innerHTML = isBooked
+                ? '<span class="tag yes">Confirmed</span>'
+                : '<span class="tag nob">Not Scheduled</span>';
+
+            $("pApptGrid").innerHTML = [
+                ["Appointment Date", esc(c.appointment_date || "—")],
+                ["Time Slot", esc(c.appointment_time || "—")],
+                ["Doctor / Facility", esc(c.doctor_name || "Assigned by AI")],
+                ["Department / Reason", esc(c.department || c.notes || "General Inquiry")]
+            ].map(function (f) {
+                return '<div class="field-box"><span>' + f[0] + '</span><b>' + f[1] + '</b></div>';
+            }).join("");
+
+            // Telephony Grid
+            $("pCallGrid").innerHTML = [
+                ["Call Started", esc(c.call_time || "—")],
+                ["Call Duration", fmtDur(c.duration_sec)],
+                ["Call Direction", isInbound ? "Inbound (Patient called)" : "Outbound (Bot dialed)"],
+                ["Call SID", '<span class="num">' + esc((c.callSid || c.id || "—").slice(-16)) + '</span>']
+            ].map(function (f) {
+                return '<div class="field-box"><span>' + f[0] + '</span><b>' + f[1] + '</b></div>';
+            }).join("");
+
+            // Call Summary
+            if (c.notes && c.notes.trim()) {
+                $("pSummary").textContent = c.notes;
+            } else {
+                var generatedSummary = "Call with " + name + " (" + phone + ") lasted " + fmtDur(c.duration_sec) + ". ";
+                if (isBooked) {
+                    generatedSummary += "Patient scheduled an appointment for " + (c.appointment_date || "upcoming date") + (c.appointment_time ? (" at " + c.appointment_time) : "") + ".";
+                } else {
+                    generatedSummary += "Caller inquired about clinic/property information; call concluded without a booking.";
+                }
+                $("pSummary").textContent = generatedSummary;
+            }
+
+            // Conversation turns
             var turns = Array.isArray(c.transcript) ? c.transcript : [];
-            $("pChat").innerHTML = turns.length ? turns.map(function (t) {
-                var roleStr = String(t.role || "").toLowerCase();
-                var isAgent = /agent|assistant|bot|ai/.test(roleStr);
-                var msg = t.message || t.text || t.content || "";
-                return '<div class="bubble ' + (isAgent ? "agent" : "user") + '"><small>' + (isAgent ? "AI Assistant" : "Patient") + '</small>' + esc(msg) + '</div>';
-            }).join("") : '<p class="noChat">No transcript saved for this call.</p>';
+            $("turnsCount").textContent = turns.length + " turns";
+
+            if (turns.length > 0) {
+                $("pChat").innerHTML = turns.map(function (t) {
+                    var roleStr = String(t.role || "").toLowerCase();
+                    var isAgent = /agent|assistant|bot|ai/.test(roleStr);
+                    var msg = t.message || t.text || t.content || "";
+                    var timeStr = "";
+                    if (t.timestamp) {
+                        try {
+                            var d = new Date(t.timestamp);
+                            if (!isNaN(d.getTime())) {
+                                timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            }
+                        } catch(e) {}
+                    }
+
+                    return '<div class="chat-bubble ' + (isAgent ? "agent" : "user") + '">' +
+                        '<div class="bubble-meta">' +
+                            '<span class="bubble-role">' + (isAgent ? "🤖 AI Voice Assistant" : "👤 " + esc(name)) + '</span>' +
+                            (timeStr ? ('<span>' + timeStr + '</span>') : '') +
+                        '</div>' +
+                        '<div>' + esc(msg) + '</div>' +
+                    '</div>';
+                }).join("");
+            } else {
+                $("pChat").innerHTML = '<p class="noChat">No conversation transcript turns recorded for this call.</p>';
+            }
+
+            // Find all calls with the same phone number for cross-call history
+            var cleanCurrPhone = cleanPhone(c.phone);
+            var relatedCalls = [];
+            if (cleanCurrPhone && cleanCurrPhone.length >= 7) {
+                relatedCalls = calls.filter(function (x) {
+                    return cleanPhone(x.phone) === cleanCurrPhone && x.id !== c.id;
+                });
+            }
+
+            if (relatedCalls.length > 0) {
+                $("historyCard").style.display = "block";
+                $("historyCount").textContent = (relatedCalls.length + 1) + " total calls";
+                $("pHistory").innerHTML = relatedCalls.map(function (rc) {
+                    return '<div class="history-item" data-id="' + esc(rc.id) + '">' +
+                        '<div>' +
+                            '<b>' + esc(rc.call_time || "Earlier Call") + '</b>' +
+                            '<span> — ' + fmtDur(rc.duration_sec) + ' (' + (rc.booked === "yes" ? "Booked" : "No booking") + ')</span>' +
+                        '</div>' +
+                        '<span class="tag ' + (rc.booked === "yes" ? "yes" : "nob") + '">View Log →</span>' +
+                    '</div>';
+                }).join("");
+
+                Array.prototype.forEach.call(document.querySelectorAll(".history-item"), function (item) {
+                    item.addEventListener("click", function () {
+                        var hId = item.getAttribute("data-id");
+                        var found = calls.find(function (x) { return String(x.id) === String(hId); });
+                        if (found) openDetail(found);
+                    });
+                });
+            } else {
+                $("historyCard").style.display = "none";
+            }
+
+            // Show overlay cleanly
             $("overlay").hidden = false;
+            $("overlay").classList.add("open");
         }
-        function closeDetail() { $("overlay").hidden = true; }
+
+        function closeDetail() {
+            $("overlay").classList.remove("open");
+            $("overlay").hidden = true;
+            activeCallId = null;
+        }
+
         $("closeBtn").addEventListener("click", closeDetail);
-        $("overlay").addEventListener("click", function (e) { if (e.target.id === "overlay") closeDetail(); });
-        document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDetail(); });
+        $("overlay").addEventListener("click", function (e) {
+            if (e.target.id === "overlay") closeDetail();
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeDetail();
+        });
 
         async function poll() {
             try {
@@ -496,14 +962,20 @@
                 if (!res.ok) throw new Error("HTTP " + res.status);
                 calls = await res.json();
                 $("dot").className = "dot";
-                $("src").textContent = "Live — " + calls.length + " calls — updated " + new Date().toLocaleTimeString();
+                $("src").textContent = "Live — " + calls.length + " records loaded — updated " + new Date().toLocaleTimeString();
                 $("errbox").hidden = true;
                 render();
+
+                // If modal is currently open, refresh the active record
+                if (activeCallId) {
+                    var updated = calls.find(function (x) { return String(x.id) === String(activeCallId); });
+                    if (updated) openDetail(updated);
+                }
             } catch (err) {
                 $("dot").className = "dot bad";
                 $("src").textContent = "Connection issue, retrying…";
                 $("errbox").hidden = false;
-                $("errbox").textContent = "Couldn't reach the server: " + err.message;
+                $("errbox").textContent = "Couldn't reach server: " + err.message;
             }
         }
 

@@ -227,6 +227,8 @@ function normalize(doc, phoneToPatientName = {}) {
 
   return {
     id: doc._id ? doc._id.toString() : doc.id || "",
+    callSid: doc.callSid || appt.callSid || "",
+    status: doc.status || "completed",
     name: name,
     phone: phone,
     direction: (doc.direction || doc.call_direction || "inbound")
@@ -239,6 +241,8 @@ function normalize(doc, phoneToPatientName = {}) {
     booked: isBooked ? "yes" : "no",
     appointment_date: appt.date || doc.appointment_date || "—",
     appointment_time: timeSlot,
+    doctor_name: appt.doctorName || doc.doctorName || "",
+    department: appt.department || doc.department || "",
     notes: appt.reason || doc.notes || doc.summary || "",
     transcript: transcript,
   };
@@ -278,7 +282,7 @@ app.get("/api/calls", async (req, res) => {
               const logs = await calllogsCollection
                 .find(
                   { _id: { $in: ids } },
-                  { projection: { _id: 1, transcript: 1, notes: 1 } }
+                  { projection: { _id: 1, callSid: 1, status: 1, transcript: 1, notes: 1 } }
                 )
                 .toArray();
 
@@ -296,6 +300,12 @@ app.get("/api/calls", async (req, res) => {
                   }
                   if (!item.notes && matched.notes) {
                     item.notes = matched.notes;
+                  }
+                  if (!item.callSid && matched.callSid) {
+                    item.callSid = matched.callSid;
+                  }
+                  if (!item.status && matched.status) {
+                    item.status = matched.status;
                   }
                 }
               });
