@@ -68,6 +68,7 @@ app.post("/webhook/call", express.json({ limit: "5mb" }), async (req, res) => {
       booked: pick("appointment_booked") || "no",
       appointment_date: pick("appointment_date") || "",
       appointment_time: pick("appointment_time") || "",
+      doctor_name: pick("doctor_name") || pick("doctor") || pick("doctorName") || (data.metadata && (data.metadata.doctor_name || data.metadata.doctor)) || "",
       notes: (data.analysis && data.analysis.transcript_summary) || "",
       transcript: Array.isArray(data.transcript)
         ? data.transcript.map((t) => ({
@@ -303,11 +304,23 @@ app.get("/api/calls", async (req, res) => {
               const logs = await calllogsCollection
                 .find(
                   { _id: { $in: ids } },
-                  { projection: { _id: 1, callSid: 1, status: 1, transcript: 1, notes: 1 } }
+                  { projection: { _id: 1, callSid: 1, status: 1, transcript: 1, notes: 1, doctorName: 1 } }
                 )
                 .toArray();
 
               const logMap = new Map(logs.map((l) => [l._id.toString(), l]));
+
+              let apptMapBySid = new Map();
+              let apptMapByPhone = new Map();
+              if (appointmentsCollection) {
+                try {
+                  const appts = await appointmentsCollection.find({}).toArray();
+                  appts.forEach((a) => {
+                    if (a.callSid) apptMapBySid.set(a.callSid, a);
+                    if (a.phone) apptMapByPhone.set(cleanPhone(a.phone), a);
+                  });
+                } catch (e) {}
+              }
 
               data.forEach((item) => {
                 const matched = logMap.get(item.id);
@@ -327,6 +340,25 @@ app.get("/api/calls", async (req, res) => {
                   }
                   if (!item.status && matched.status) {
                     item.status = matched.status;
+                  }
+                  if (!item.doctor_name && matched.doctorName) {
+                    item.doctor_name = matched.doctorName;
+                  }
+                }
+
+                // Match with appointment records
+                const apptRecord =
+                  (item.callSid && apptMapBySid.get(item.callSid)) ||
+                  (item.phone && apptMapByPhone.get(cleanPhone(item.phone)));
+                if (apptRecord) {
+                  if (!item.doctor_name && apptRecord.doctorName) {
+                    item.doctor_name = apptRecord.doctorName;
+                  }
+                  if (!item.department && apptRecord.department) {
+                    item.department = apptRecord.department;
+                  }
+                  if ((!item.appointment_date || item.appointment_date === "—") && apptRecord.date) {
+                    item.appointment_date = apptRecord.date;
                   }
                 }
               });

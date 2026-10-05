@@ -315,6 +315,27 @@
             gap: 4px;
         }
 
+        .doc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            font-size: 12.5px;
+            color: #0369a1;
+            background: #e0f2fe;
+            padding: 3px 9px;
+            border-radius: 6px;
+            border: 1px solid #bae6fd;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .doc-badge {
+                color: #7dd3fc;
+                background: #082f49;
+                border-color: #0369a1;
+            }
+        }
+
         .empty, .err {
             padding: 36px 20px;
             text-align: center;
@@ -641,6 +662,67 @@
             font-size: 12px;
             color: var(--mute);
         }
+
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .filter-select {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.15s;
+        }
+
+        .filter-select:focus, .filter-select:hover {
+            border-color: var(--primary);
+        }
+
+        .filter-reset-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .filter-reset-btn:hover {
+            text-decoration: underline;
+        }
+
+        .dept-tag {
+            background: #ede9fe;
+            color: #6d28d9;
+            border: 1px solid #ddd6fe;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .dept-tag {
+                background: #2e1065;
+                color: #c4b5fd;
+                border-color: #5b21b6;
+            }
+        }
     </style>
 </head>
 
@@ -665,7 +747,22 @@
 
         <div class="search-bar">
             <span class="search-icon">🔍</span>
-            <input id="q" type="search" placeholder="Search patient name, phone number, doctor, or keyword…" aria-label="Search">
+            <input id="q" type="search" placeholder="Search patient name, phone number, doctor, symptom, or keyword…" aria-label="Search">
+        </div>
+
+        <div class="filters-row">
+            <select id="filterStatus" class="filter-select" aria-label="Filter by booking status">
+                <option value="">All Bookings</option>
+                <option value="yes">✓ Booked Appointments Only</option>
+                <option value="no">No Booking</option>
+            </select>
+            <select id="filterDept" class="filter-select" aria-label="Filter by department">
+                <option value="">All Departments</option>
+            </select>
+            <select id="filterDoctor" class="filter-select" aria-label="Filter by doctor">
+                <option value="">All Doctors / Specialists</option>
+            </select>
+            <button id="resetFilters" class="filter-reset-btn" style="display:none;">Clear Filters ✕</button>
         </div>
 
         <div class="wrap">
@@ -674,9 +771,10 @@
                     <tr>
                         <th>Patient Name</th>
                         <th>Phone Number</th>
-                        <th>Direction</th>
                         <th>Call Time</th>
                         <th>Booking Status</th>
+                        <th>Doctor / Specialist</th>
+                        <th>Department / Concern</th>
                         <th>Appointment Date & Time</th>
                     </tr>
                 </thead>
@@ -780,6 +878,110 @@
             return name.slice(0, 2).toUpperCase();
         }
 
+        var DEPT_PATTERNS = [
+            {
+                name: "General Physician",
+                icon: "🩺",
+                concern: "Fever, Cold, Cough & Infection",
+                keywords: ["fever", "bukhar", "बुखार", "cold", "jukam", "जुकाम", "cough", "khansi", "खांसी", "headache", "sirdard", "सिरदर्द", "weakness", "kamzori", "कमजोरी", "vomiting", "ulti", "उल्टी", "pet dard", "पेट दर्द", "loose motion", "dast", "दस्त", "sugar", "शुगर", "bp", "बीपी", "viral", "flu", "physician", "fizisiyan", "दवाई", "tabiyat", "तबीयत", "doctor"]
+            },
+            {
+                name: "Orthopedic",
+                icon: "🦴",
+                concern: "Bone, Joint & Back Pain",
+                keywords: ["bone", "fracture", "joint", "जोड़ों", "knee", "ghutna", "घुटने", "back pain", "kamar dard", "कमर दर्द", "arthritis", "gathiya", "गठिया", "moch", "मोच", "haddi", "हड्डी", "neck pain", "ortho"]
+            },
+            {
+                name: "Cardiologist",
+                icon: "❤️",
+                concern: "Heart & Chest Discomfort",
+                keywords: ["heart", "दिल", "chest pain", "सीने में दर्द", "cardiac", "high bp", "धड़कन", "sans phoolna", "सांस फूलना", "palpitation"]
+            },
+            {
+                name: "Pediatrician",
+                icon: "👶",
+                concern: "Child Care & Pediatric",
+                keywords: ["child", "बच्च", "baby", "infant", "pediatric", "टीकाकरण", "vaccination", "kids"]
+            },
+            {
+                name: "Gynecologist",
+                icon: "🌸",
+                concern: "Women's Health & Maternity",
+                keywords: ["pregnancy", "प्रेगनेंसी", "period", "पीरियड", "pcod", "pcos", "mahila", "महिला", "gynae", "गाइनी"]
+            },
+            {
+                name: "ENT Specialist",
+                icon: "👂",
+                concern: "Ear, Nose & Throat",
+                keywords: ["ear", "कान", "nose", "नाक", "throat", "गला", "sinus", "साइनस", "tonsil", "टॉन्सिल", "hearing"]
+            },
+            {
+                name: "Real Estate & Housing",
+                icon: "🏢",
+                concern: "Apartment & Property Inquiry",
+                keywords: ["flat", "फ्लैट", "bhk", "villa", "विला", "plot", "प्लॉट", "property", "प्रॉपर्टी", "apartment", "residency", "site visit", "विज़िट", "rent", "buy", "residential"]
+            }
+        ];
+
+        function getPatientDepartment(c) {
+            // 1. Direct doctor mapping if known
+            var docLower = (c.doctor_name || "").toLowerCase();
+            if (docLower.includes("ananya")) {
+                return { name: "General Physician", icon: "🩺", concern: "General Medical Consultation" };
+            }
+            if (docLower.includes("sanjay")) {
+                return { name: "Orthopedic", icon: "🦴", concern: "Bone & Joint Care" };
+            }
+            if (docLower.includes("rohit")) {
+                return { name: "Cardiologist", icon: "❤️", concern: "Heart Care" };
+            }
+            if (docLower.includes("priya")) {
+                return { name: "Pediatrician", icon: "👶", concern: "Child Care" };
+            }
+            if (docLower.includes("kavita")) {
+                return { name: "Gynecologist", icon: "🌸", concern: "Women's Health" };
+            }
+            if (docLower.includes("rajesh")) {
+                return { name: "ENT Specialist", icon: "👂", concern: "Ear, Nose & Throat" };
+            }
+            if (docLower.includes("city greens") || docLower.includes("residency")) {
+                return { name: "Real Estate & Housing", icon: "🏢", concern: "Apartment & Property Booking" };
+            }
+
+            // 2. Direct department field if set
+            var deptLower = (c.department || "").toLowerCase();
+            if (deptLower.includes("physician") || deptLower.includes("general")) {
+                return { name: "General Physician", icon: "🩺", concern: "Fever, Cold & General Care" };
+            }
+            if (deptLower.includes("ortho")) {
+                return { name: "Orthopedic", icon: "🦴", concern: "Bone & Joint Consultation" };
+            }
+            if (deptLower.includes("cardio")) {
+                return { name: "Cardiologist", icon: "❤️", concern: "Cardiology" };
+            }
+            if (deptLower.includes("pediatric")) {
+                return { name: "Pediatrician", icon: "👶", concern: "Pediatrics" };
+            }
+            if (deptLower.includes("apart") || deptLower.includes("resident") || deptLower.includes("real estate")) {
+                return { name: "Real Estate & Housing", icon: "🏢", concern: "Property Booking" };
+            }
+
+            // 3. Scan notes, reason, and transcript
+            var turnsText = (c.transcript || []).map(function(t) { return t.message || t.text || ""; }).join(" ");
+            var haystack = [(c.notes || ""), (c.department || ""), turnsText].join(" ").toLowerCase();
+
+            for (var i = 0; i < DEPT_PATTERNS.length; i++) {
+                var p = DEPT_PATTERNS[i];
+                for (var j = 0; j < p.keywords.length; j++) {
+                    if (haystack.indexOf(p.keywords[j].toLowerCase()) > -1) {
+                        return { name: p.name, icon: p.icon, concern: p.concern, keyword: p.keywords[j] };
+                    }
+                }
+            }
+
+            return { name: "General Consultation", icon: "📋", concern: "General Medical Inquiry" };
+        }
+
         function cleanPhone(p) {
             if (!p) return "";
             return String(p).replace(/\D/g, "").slice(-10);
@@ -811,25 +1013,88 @@
             };
         }
 
+        function updateFilterDropdowns() {
+            var currentDept = $("filterDept").value;
+            var currentDoc = $("filterDoctor").value;
+
+            var deptsSet = new Set();
+            var docsSet = new Set();
+
+            calls.forEach(function (c) {
+                var d = getPatientDepartment(c);
+                if (d && d.name) deptsSet.add(d.name);
+                var doc = c.doctor_name;
+                if (!doc && c.appointment_time) {
+                    var m = c.appointment_time.match(/^([^(]+)(?:\(([^)]+)\))?/);
+                    if (m && m[2]) doc = m[2].trim();
+                }
+                if (doc && doc !== "—") docsSet.add(doc);
+            });
+
+            // Populate Dept dropdown
+            var deptOptions = '<option value="">All Departments (' + deptsSet.size + ')</option>';
+            Array.from(deptsSet).sort().forEach(function (deptName) {
+                deptOptions += '<option value="' + esc(deptName) + '"' + (deptName === currentDept ? ' selected' : '') + '>' + esc(deptName) + '</option>';
+            });
+            $("filterDept").innerHTML = deptOptions;
+
+            // Populate Doctor dropdown
+            var docOptions = '<option value="">All Doctors / Specialists (' + docsSet.size + ')</option>';
+            Array.from(docsSet).sort().forEach(function (docName) {
+                docOptions += '<option value="' + esc(docName) + '"' + (docName === currentDoc ? ' selected' : '') + '>👨‍⚕️ ' + esc(docName) + '</option>';
+            });
+            $("filterDoctor").innerHTML = docOptions;
+        }
+
         function render() {
             var q = $("q").value.toLowerCase().trim();
+            var fStatus = $("filterStatus").value;
+            var fDept = $("filterDept").value;
+            var fDoctor = $("filterDoctor").value;
+
+            $("resetFilters").style.display = (q || fStatus || fDept || fDoctor) ? "inline-block" : "none";
+
             var list = calls.filter(function (c) {
+                var isBooked = c.booked === "yes";
+                if (fStatus === "yes" && !isBooked) return false;
+                if (fStatus === "no" && isBooked) return false;
+
+                var parsed = parseAppt(c.appointment_date, c.appointment_time, c.doctor_name);
+                var docName = c.doctor_name || parsed.venue || "";
+                var dept = getPatientDepartment(c);
+
+                if (fDept && dept.name !== fDept) return false;
+                if (fDoctor && docName !== fDoctor) return false;
+
                 if (!q) return true;
                 var haystack = [
                     c.name || "",
                     c.phone || "",
+                    docName,
+                    dept.name,
+                    dept.concern,
                     c.appointment_date || "",
                     c.appointment_time || "",
                     c.notes || "",
                     c.callSid || ""
                 ].join(" ").toLowerCase();
+
                 return haystack.indexOf(q) > -1;
             });
 
             $("body").innerHTML = list.map(function (c, i) {
                 var isBooked = c.booked === "yes";
-                var isInbound = (c.direction || "inbound").toLowerCase().startsWith("in");
                 var parsed = parseAppt(c.appointment_date, c.appointment_time, c.doctor_name);
+                var docName = c.doctor_name || parsed.venue || "";
+                var dept = getPatientDepartment(c);
+
+                var docHtml = '<span style="color: var(--mute);">—</span>';
+                if (docName && docName !== "—") {
+                    docHtml = '<div class="doc-badge"><span>👨‍⚕️</span> ' + esc(docName) + '</div>';
+                }
+
+                var deptHtml = '<span class="tag dept-tag">' + dept.icon + ' ' + esc(dept.name) + '</span>';
+
                 var apptHtml = '<span style="color: var(--mute);">—</span>';
                 if (parsed.date || parsed.time) {
                     var datePart = parsed.date ? ('<div class="appt-date">' + esc(parsed.date) + '</div>') : '';
@@ -843,9 +1108,10 @@
                         '<div><span class="patient-name">' + esc(c.name || "Unknown Patient") + '</span></div>' +
                     '</div></td>' +
                     '<td class="num">' + esc(c.phone || "—") + '</td>' +
-                    '<td><span class="tag ' + (isInbound ? "in" : "out") + '">' + (isInbound ? "📥 Inbound" : "📤 Outbound") + '</span></td>' +
                     '<td class="num">' + esc(c.call_time || "—") + '</td>' +
                     '<td><span class="tag ' + (isBooked ? "yes" : "nob") + '">' + (isBooked ? "✓ Booked" : "No Booking") + '</span></td>' +
+                    '<td>' + docHtml + '</td>' +
+                    '<td>' + deptHtml + '</td>' +
                     '<td>' + apptHtml + '</td>' +
                 '</tr>';
             }).join("");
@@ -871,22 +1137,23 @@
             var name = c.name || "Unknown Patient";
             var phone = c.phone || "No phone number";
             var isBooked = c.booked === "yes";
-            var isInbound = (c.direction || "inbound").toLowerCase().startsWith("in");
+            var parsed = parseAppt(c.appointment_date, c.appointment_time, c.doctor_name);
+            var docName = c.doctor_name || parsed.venue || "";
+            var dept = getPatientDepartment(c);
 
             $("pAvatar").textContent = getInitials(name);
             $("pName").textContent = name;
             $("pPhone").textContent = phone;
             $("pPhone").href = phone !== "No phone number" ? ("tel:" + phone) : "#";
 
-            // Badges in Header
+            // Badges in Header (Direction removed as requested)
             $("pBadges").innerHTML = [
                 '<span class="tag ' + (isBooked ? "yes" : "nob") + '">' + (isBooked ? "✓ Appointment Confirmed" : "No Appointment Booked") + '</span>',
-                '<span class="tag ' + (isInbound ? "in" : "out") + '">' + (isInbound ? "📥 Inbound Call" : "📤 Outbound Call") + '</span>',
+                '<span class="tag dept-tag">' + dept.icon + ' ' + esc(dept.name) + '</span>',
+                docName ? ('<span class="tag in">👨‍⚕️ ' + esc(docName) + '</span>') : '',
                 '<span class="tag nob">⏱️ ' + fmtDur(c.duration_sec) + '</span>',
                 c.status ? ('<span class="tag nob">Status: ' + esc(c.status) + '</span>') : ''
-            ].join("");
-
-            var parsed = parseAppt(c.appointment_date, c.appointment_time, c.doctor_name);
+            ].filter(Boolean).join("");
 
             // Appointment Grid
             $("apptStatusBadge").innerHTML = isBooked
@@ -894,10 +1161,11 @@
                 : '<span class="tag nob">Not Scheduled</span>';
 
             $("pApptGrid").innerHTML = [
+                ["Department / Specialty", '<span class="tag dept-tag">' + dept.icon + ' ' + esc(dept.name) + '</span>'],
+                ["Patient Chief Concern", '<b>' + esc(dept.concern) + '</b>'],
+                ["Doctor / Specialist", esc(docName || "Assigned by AI Assistant")],
                 ["Appointment Date", esc(parsed.date || "—")],
-                ["Time Slot", esc(parsed.time || "—")],
-                ["Doctor / Facility", esc(parsed.venue || c.doctor_name || "Assigned by AI")],
-                ["Department / Reason", esc(c.department || c.notes || "General Consultation")]
+                ["Time Slot", esc(parsed.time || "—")]
             ].map(function (f) {
                 return '<div class="field-box"><span>' + f[0] + '</span><b>' + f[1] + '</b></div>';
             }).join("");
@@ -906,7 +1174,7 @@
             $("pCallGrid").innerHTML = [
                 ["Call Started", esc(c.call_time || "—")],
                 ["Call Duration", fmtDur(c.duration_sec)],
-                ["Call Direction", isInbound ? "Inbound (Patient called)" : "Outbound (Bot dialed)"],
+                ["AI Assistant Channel", "Exotel Voice Assistant"],
                 ["Call SID", '<span class="num">' + esc((c.callSid || c.id || "—").slice(-16)) + '</span>']
             ].map(function (f) {
                 return '<div class="field-box"><span>' + f[0] + '</span><b>' + f[1] + '</b></div>';
@@ -918,9 +1186,9 @@
             } else {
                 var generatedSummary = "Call with " + name + " (" + phone + ") lasted " + fmtDur(c.duration_sec) + ". ";
                 if (isBooked) {
-                    generatedSummary += "Patient scheduled an appointment for " + (parsed.date || "upcoming date") + (parsed.time ? (" at " + parsed.time) : "") + (parsed.venue ? (" with " + parsed.venue) : "") + ".";
+                    generatedSummary += "Patient booked an appointment in " + dept.name + " (" + dept.concern + ") with " + (docName || "the assigned doctor") + " for " + (parsed.date || "upcoming date") + (parsed.time ? (" at " + parsed.time) : "") + ".";
                 } else {
-                    generatedSummary += "Caller inquired about clinic/property information; call concluded without a booking.";
+                    generatedSummary += "Caller inquired about " + dept.concern + "; call concluded without scheduling an appointment.";
                 }
                 $("pSummary").textContent = generatedSummary;
             }
@@ -1008,6 +1276,21 @@
             if (e.key === "Escape") closeDetail();
         });
 
+        function resetAllFilters() {
+            $("q").value = "";
+            $("filterStatus").value = "";
+            $("filterDept").value = "";
+            $("filterDoctor").value = "";
+            render();
+        }
+
+        $("q").addEventListener("input", render);
+        $("filterStatus").addEventListener("change", render);
+        $("filterDept").addEventListener("change", render);
+        $("filterDoctor").addEventListener("change", render);
+        $("resetFilters").addEventListener("click", resetAllFilters);
+        $("refresh").addEventListener("click", poll);
+
         async function poll() {
             try {
                 var res = await fetch("/api/calls", { cache: "no-store" });
@@ -1016,6 +1299,7 @@
                 $("dot").className = "dot";
                 $("src").textContent = "Live — " + calls.length + " records loaded — updated " + new Date().toLocaleTimeString();
                 $("errbox").hidden = true;
+                updateFilterDropdowns();
                 render();
 
                 // If modal is currently open, refresh the active record
@@ -1031,8 +1315,6 @@
             }
         }
 
-        $("q").addEventListener("input", render);
-        $("refresh").addEventListener("click", poll);
         poll();
         setInterval(poll, POLL_MS);
     </script>
