@@ -292,6 +292,29 @@
         .tag.yes { background: var(--okbg); color: var(--ok); }
         .tag.nob { background: var(--nobg); color: var(--no); }
 
+        .appt-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .appt-date {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--ink);
+            letter-spacing: -0.01em;
+        }
+
+        .appt-time {
+            font-size: 11.5px;
+            color: var(--mute);
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         .empty, .err {
             padding: 36px 20px;
             text-align: center;
@@ -762,6 +785,32 @@
             return String(p).replace(/\D/g, "").slice(-10);
         }
 
+        function parseAppt(dateStr, timeStr, docName) {
+            var rawTime = (timeStr || "").trim();
+            var cleanTime = rawTime;
+            var venueName = docName || "";
+
+            if (rawTime && rawTime !== "—") {
+                var match = rawTime.match(/^([^(]+)(?:\(([^)]+)\))?/);
+                if (match) {
+                    cleanTime = match[1].trim();
+                    if (match[2] && !venueName) {
+                        venueName = match[2].trim();
+                    }
+                }
+            }
+
+            var cleanDate = (dateStr || "").trim();
+            if (cleanDate === "—" || cleanDate === "–") cleanDate = "";
+            if (cleanTime === "—" || cleanTime === "–") cleanTime = "";
+
+            return {
+                date: cleanDate,
+                time: cleanTime,
+                venue: venueName
+            };
+        }
+
         function render() {
             var q = $("q").value.toLowerCase().trim();
             var list = calls.filter(function (c) {
@@ -780,11 +829,12 @@
             $("body").innerHTML = list.map(function (c, i) {
                 var isBooked = c.booked === "yes";
                 var isInbound = (c.direction || "inbound").toLowerCase().startsWith("in");
-                var apptStr = "—";
-                if (c.appointment_date && c.appointment_date !== "—") {
-                    apptStr = esc(c.appointment_date) + (c.appointment_time && c.appointment_time !== "—" ? (" at " + esc(c.appointment_time)) : "");
-                } else if (c.appointment_time && c.appointment_time !== "—") {
-                    apptStr = esc(c.appointment_time);
+                var parsed = parseAppt(c.appointment_date, c.appointment_time, c.doctor_name);
+                var apptHtml = '<span style="color: var(--mute);">—</span>';
+                if (parsed.date || parsed.time) {
+                    var datePart = parsed.date ? ('<div class="appt-date">' + esc(parsed.date) + '</div>') : '';
+                    var timePart = parsed.time ? ('<div class="appt-time">🕒 ' + esc(parsed.time) + '</div>') : '';
+                    apptHtml = '<div class="appt-cell">' + datePart + timePart + '</div>';
                 }
 
                 return '<tr class="callRow" data-id="' + esc(c.id) + '">' +
@@ -796,7 +846,7 @@
                     '<td><span class="tag ' + (isInbound ? "in" : "out") + '">' + (isInbound ? "📥 Inbound" : "📤 Outbound") + '</span></td>' +
                     '<td class="num">' + esc(c.call_time || "—") + '</td>' +
                     '<td><span class="tag ' + (isBooked ? "yes" : "nob") + '">' + (isBooked ? "✓ Booked" : "No Booking") + '</span></td>' +
-                    '<td>' + apptStr + '</td>' +
+                    '<td>' + apptHtml + '</td>' +
                 '</tr>';
             }).join("");
 
@@ -836,16 +886,18 @@
                 c.status ? ('<span class="tag nob">Status: ' + esc(c.status) + '</span>') : ''
             ].join("");
 
+            var parsed = parseAppt(c.appointment_date, c.appointment_time, c.doctor_name);
+
             // Appointment Grid
             $("apptStatusBadge").innerHTML = isBooked
                 ? '<span class="tag yes">Confirmed</span>'
                 : '<span class="tag nob">Not Scheduled</span>';
 
             $("pApptGrid").innerHTML = [
-                ["Appointment Date", esc(c.appointment_date || "—")],
-                ["Time Slot", esc(c.appointment_time || "—")],
-                ["Doctor / Facility", esc(c.doctor_name || "Assigned by AI")],
-                ["Department / Reason", esc(c.department || c.notes || "General Inquiry")]
+                ["Appointment Date", esc(parsed.date || "—")],
+                ["Time Slot", esc(parsed.time || "—")],
+                ["Doctor / Facility", esc(parsed.venue || c.doctor_name || "Assigned by AI")],
+                ["Department / Reason", esc(c.department || c.notes || "General Consultation")]
             ].map(function (f) {
                 return '<div class="field-box"><span>' + f[0] + '</span><b>' + f[1] + '</b></div>';
             }).join("");
@@ -866,7 +918,7 @@
             } else {
                 var generatedSummary = "Call with " + name + " (" + phone + ") lasted " + fmtDur(c.duration_sec) + ". ";
                 if (isBooked) {
-                    generatedSummary += "Patient scheduled an appointment for " + (c.appointment_date || "upcoming date") + (c.appointment_time ? (" at " + c.appointment_time) : "") + ".";
+                    generatedSummary += "Patient scheduled an appointment for " + (parsed.date || "upcoming date") + (parsed.time ? (" at " + parsed.time) : "") + (parsed.venue ? (" with " + parsed.venue) : "") + ".";
                 } else {
                     generatedSummary += "Caller inquired about clinic/property information; call concluded without a booking.";
                 }

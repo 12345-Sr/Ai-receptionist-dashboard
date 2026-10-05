@@ -210,12 +210,18 @@ function normalize(doc, phoneToPatientName = {}) {
   }
 
   let timeSlot = "—";
-  if (appt.time) {
-    timeSlot = appt.doctorName ? `${appt.time} (${appt.doctorName})` : appt.time;
-  } else if (doc.appointment_time) {
-    timeSlot = doc.appointment_time;
-  } else if (doc.time_slot) {
-    timeSlot = doc.time_slot;
+  let extractedVenue = appt.doctorName || doc.doctorName || "";
+  let rawTime = appt.time || doc.appointment_time || doc.time_slot || "";
+  if (rawTime) {
+    const vMatch = rawTime.match(/^([^(]+)(?:\(([^)]+)\))?/);
+    if (vMatch) {
+      timeSlot = vMatch[1].trim();
+      if (vMatch[2] && !extractedVenue) {
+        extractedVenue = vMatch[2].trim();
+      }
+    } else {
+      timeSlot = rawTime.trim();
+    }
   }
 
   let rawTurns = Array.isArray(doc.transcript) ? doc.transcript : [];
@@ -241,7 +247,7 @@ function normalize(doc, phoneToPatientName = {}) {
     booked: isBooked ? "yes" : "no",
     appointment_date: appt.date || doc.appointment_date || "—",
     appointment_time: timeSlot,
-    doctor_name: appt.doctorName || doc.doctorName || "",
+    doctor_name: extractedVenue || appt.doctorName || doc.doctorName || "",
     department: appt.department || doc.department || "",
     notes: appt.reason || doc.notes || doc.summary || "",
     transcript: transcript,
@@ -264,6 +270,21 @@ app.get("/api/calls", async (req, res) => {
 
       if (backendRes.ok) {
         const data = await backendRes.json();
+
+        // Strip parenthetical venue/doctor name from appointment_time and save to doctor_name
+        if (Array.isArray(data)) {
+          data.forEach((item) => {
+            if (item.appointment_time && item.appointment_time !== "—") {
+              const vMatch = item.appointment_time.match(/^([^(]+)(?:\(([^)]+)\))?/);
+              if (vMatch) {
+                item.appointment_time = vMatch[1].trim();
+                if (vMatch[2] && !item.doctor_name) {
+                  item.doctor_name = vMatch[2].trim();
+                }
+              }
+            }
+          });
+        }
 
         // Enrich with transcripts from MongoDB if backend API records don't have them
         if (calllogsCollection && Array.isArray(data) && data.length > 0) {
