@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Voice Agent Bookings</title>
+    <title>Patient Bookings</title>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -22,7 +22,8 @@
             --inbg: #dcecf8;
             --outbg: #f9e8da;
             --warn: #a4321a;
-            --warnbg: #fbe6e0;
+            --agent: #eef3fb;
+            --user: #eef8f3;
             box-sizing: border-box;
             padding-top: env(safe-area-inset-top, 0px);
             padding-bottom: env(safe-area-inset-bottom, 0px)
@@ -44,7 +45,8 @@
                 --inbg: #12304a;
                 --outbg: #402a15;
                 --warn: #f0806a;
-                --warnbg: #3a1c16
+                --agent: #18283a;
+                --user: #17302a
             }
         }
 
@@ -63,7 +65,8 @@
             --inbg: #12304a;
             --outbg: #402a15;
             --warn: #f0806a;
-            --warnbg: #3a1c16
+            --agent: #18283a;
+            --user: #17302a
         }
 
         html {
@@ -82,7 +85,7 @@
         }
 
         main {
-            max-width: 1080px;
+            max-width: 860px;
             margin: 0 auto;
             padding: 20px 16px 40px
         }
@@ -93,7 +96,7 @@
             gap: 12px;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px
+            margin-bottom: 16px
         }
 
         h1 {
@@ -116,7 +119,8 @@
             height: 8px;
             border-radius: 50%;
             background: var(--ok);
-            display: inline-block
+            display: inline-block;
+            flex: none
         }
 
         .dot.bad {
@@ -124,7 +128,6 @@
         }
 
         button,
-        select,
         input {
             font: inherit;
             color: var(--ink)
@@ -143,55 +146,19 @@
         }
 
         .btn:focus-visible,
-        select:focus-visible,
-        input:focus-visible {
+        input:focus-visible,
+        .nameBtn:focus-visible {
             outline: 2px solid var(--in);
             outline-offset: 2px
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 12px
-        }
-
-        .stat {
-            background: var(--card);
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            padding: 14px
-        }
-
-        .stat b {
-            display: block;
-            font-size: 26px;
-            line-height: 1.2
-        }
-
-        .stat span {
-            color: var(--mute);
-            font-size: 13px
-        }
-
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px
-        }
-
-        .filters input,
-        .filters select {
+        input {
             background: var(--card);
             border: 1px solid var(--line);
             border-radius: 8px;
-            padding: 8px 10px
-        }
-
-        .filters input {
-            flex: 1;
-            min-width: 180px
+            padding: 9px 12px;
+            width: 100%;
+            margin-bottom: 12px
         }
 
         .wrap {
@@ -204,13 +171,13 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 760px
+            min-width: 480px
         }
 
         th,
         td {
             text-align: left;
-            padding: 11px 14px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--line);
             white-space: nowrap
         }
@@ -223,6 +190,122 @@
 
         tr:last-child td {
             border-bottom: 0
+        }
+
+        .nameBtn {
+            background: none;
+            border: 0;
+            padding: 0;
+            color: var(--in);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+            text-align: left
+        }
+
+        .nameBtn:hover {
+            text-decoration: underline
+        }
+
+        .num {
+            font-variant-numeric: tabular-nums
+        }
+
+        .empty,
+        .err {
+            padding: 28px;
+            text-align: center;
+            color: var(--mute)
+        }
+
+        .err {
+            color: var(--warn)
+        }
+
+        /* detail overlay */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 16, 24, .45);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 50
+        }
+
+        @media (min-width:640px) {
+            .overlay {
+                align-items: center
+            }
+        }
+
+        .panel {
+            background: var(--card);
+            width: 100%;
+            max-width: 560px;
+            max-height: 88vh;
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        @media (min-width:640px) {
+            .panel {
+                border-radius: 14px
+            }
+        }
+
+        .pHead {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .pHead h2 {
+            margin: 0 0 4px;
+            font-size: 18px
+        }
+
+        .pHead p {
+            margin: 0;
+            color: var(--mute);
+            font-size: 13px
+        }
+
+        .close {
+            background: none;
+            border: 0;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--mute);
+            padding: 4px
+        }
+
+        .pBody {
+            padding: 16px 20px;
+            overflow-y: auto
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+            margin-bottom: 16px
+        }
+
+        .field span {
+            display: block;
+            color: var(--mute);
+            font-size: 12px
+        }
+
+        .field b {
+            font-size: 14px
         }
 
         .tag {
@@ -253,19 +336,56 @@
             color: var(--no)
         }
 
-        .num {
-            font-variant-numeric: tabular-nums
+        .sectionTitle {
+            font-size: 13px;
+            color: var(--mute);
+            margin: 0 0 8px;
+            font-weight: 500
         }
 
-        .empty,
-        .err {
-            padding: 28px;
-            text-align: center;
-            color: var(--mute)
+        .summary {
+            background: var(--nobg);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+            margin-bottom: 16px
         }
 
-        .err {
-            color: var(--warn)
+        .chat {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .bubble {
+            max-width: 82%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 14px
+        }
+
+        .bubble.agent {
+            background: var(--agent);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px
+        }
+
+        .bubble.user {
+            background: var(--user);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px
+        }
+
+        .bubble small {
+            display: block;
+            color: var(--mute);
+            font-size: 11px;
+            margin-bottom: 2px
+        }
+
+        .noChat {
+            color: var(--mute);
+            font-size: 14px
         }
     </style>
 </head>
@@ -274,49 +394,49 @@
     <main>
         <header>
             <div>
-                <h1>Voice agent bookings</h1>
+                <h1>Patient bookings</h1>
                 <p class="sub"><span class="dot" id="dot"></span><span id="src">Connecting…</span></p>
             </div>
             <button class="btn" id="refresh">Refresh now</button>
         </header>
 
-        <section class="stats" id="stats"></section>
-
-        <div class="filters">
-            <input id="q" type="search" placeholder="Search name or phone number"
-                aria-label="Search name or phone number">
-            <select id="dir" aria-label="Call direction">
-                <option value="">All calls</option>
-                <option value="inbound">Inbound</option>
-                <option value="outbound">Outbound</option>
-            </select>
-            <select id="bk" aria-label="Booking status">
-                <option value="">Booked and not booked</option>
-                <option value="yes">Booked</option>
-                <option value="no">Not booked</option>
-            </select>
-        </div>
+        <input id="q" type="search" placeholder="Search name or phone number" aria-label="Search name or phone number">
 
         <div class="wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>Caller</th>
+                        <th>Name</th>
                         <th>Phone number</th>
-                        <th>Direction</th>
-                        <th>Call time</th>
-                        <th>Duration</th>
-                        <th>Booking</th>
-                        <th>Appt. date</th>
+                        <th>Date</th>
                         <th>Time slot</th>
                     </tr>
                 </thead>
                 <tbody id="body"></tbody>
             </table>
-            <div class="empty" id="empty" hidden>No calls yet.</div>
+            <div class="empty" id="empty" hidden>No bookings yet.</div>
             <div class="err" id="errbox" hidden></div>
         </div>
     </main>
+
+    <div class="overlay" id="overlay" hidden>
+        <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pName">
+            <div class="pHead">
+                <div>
+                    <h2 id="pName">—</h2>
+                    <p id="pPhone">—</p>
+                </div>
+                <button class="close" id="closeBtn" aria-label="Close">✕</button>
+            </div>
+            <div class="pBody">
+                <div class="grid2" id="pGrid"></div>
+                <p class="sectionTitle">Call summary</p>
+                <div class="summary" id="pSummary"></div>
+                <p class="sectionTitle">Conversation with AI</p>
+                <div class="chat" id="pChat"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         var $ = function (id) { return document.getElementById(id) };
@@ -326,30 +446,49 @@
         function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] }) }
         function fmtDur(s) { s = +s || 0; return Math.floor(s / 60) + "m " + String(s % 60).padStart(2, "0") + "s" }
 
-        function stats(list) {
-            var t = list.length, b = list.filter(function (c) { return c.booked === "yes" }).length;
-            var i = list.filter(function (c) { return c.direction === "inbound" }).length, o = t - i;
-            function pct(a, n) { return n ? Math.round(a / n * 100) : 0 }
-            $("stats").innerHTML = [["Total calls", t], ["Appointments booked", b], ["Booking rate", pct(b, t) + "%"], ["Inbound", i], ["Outbound", o]]
-                .map(function (s) { return '<div class="stat"><b class="num">' + s[1] + '</b><span>' + s[0] + '</span></div>' }).join("");
-        }
-
         function render() {
-            var q = $("q").value.toLowerCase().trim(), d = $("dir").value, k = $("bk").value;
+            var q = $("q").value.toLowerCase().trim();
             var list = calls.filter(function (c) {
-                return (!d || c.direction === d) && (!k || c.booked === k) && (!q || (c.name + " " + c.phone).toLowerCase().indexOf(q) > -1)
+                return !q || ((c.name || "") + " " + (c.phone || "")).toLowerCase().indexOf(q) > -1;
             });
-            stats(calls);
-            $("body").innerHTML = list.map(function (c) {
-                var y = c.booked === "yes";
-                return '<tr><td>' + esc(c.name) + '</td><td class="num">' + esc(c.phone) + '</td>' +
-                    '<td><span class="tag ' + (c.direction === "inbound" ? "in" : "out") + '">' + (c.direction === "inbound" ? "Inbound" : "Outbound") + '</span></td>' +
-                    '<td class="num">' + esc(c.call_time) + '</td><td class="num">' + fmtDur(c.duration_sec) + '</td>' +
-                    '<td><span class="tag ' + (y ? "yes" : "nob") + '">' + (y ? "Booked" : "Not booked") + '</span></td>' +
-                    '<td class="num">' + esc(c.appointment_date || "–") + '</td><td class="num">' + esc(c.appointment_time || "–") + '</td></tr>'
+            $("body").innerHTML = list.map(function (c, i) {
+                return '<tr><td><button class="nameBtn" data-i="' + i + '">' + esc(c.name || "Unknown") + '</button></td>' +
+                    '<td class="num">' + esc(c.phone) + '</td>' +
+                    '<td class="num">' + esc(c.appointment_date || "–") + '</td>' +
+                    '<td class="num">' + esc(c.appointment_time || "–") + '</td></tr>';
             }).join("");
             $("empty").hidden = list.length > 0;
+            Array.prototype.forEach.call(document.querySelectorAll(".nameBtn"), function (btn) {
+                btn.addEventListener("click", function () { openDetail(list[+btn.dataset.i]); });
+            });
         }
+
+        function openDetail(c) {
+            $("pName").textContent = c.name || "Unknown";
+            $("pPhone").textContent = c.phone || "No number";
+            var y = c.booked === "yes";
+            $("pGrid").innerHTML = [
+                ["Direction", '<span class="tag ' + (c.direction === "inbound" ? "in" : "out") + '">' + (c.direction === "inbound" ? "Inbound" : "Outbound") + '</span>'],
+                ["Booking", '<span class="tag ' + (y ? "yes" : "nob") + '">' + (y ? "Booked" : "Not booked") + '</span>'],
+                ["Call time", esc(c.call_time || "–")],
+                ["Duration", fmtDur(c.duration_sec)],
+                ["Appointment date", esc(c.appointment_date || "–")],
+                ["Time slot", esc(c.appointment_time || "–")]
+            ].map(function (f) { return '<div class="field"><span>' + f[0] + '</span><b>' + f[1] + '</b></div>'; }).join("");
+            $("pSummary").textContent = c.notes || "No summary recorded for this call.";
+            var turns = Array.isArray(c.transcript) ? c.transcript : [];
+            $("pChat").innerHTML = turns.length ? turns.map(function (t) {
+                var roleStr = String(t.role || "").toLowerCase();
+                var isAgent = /agent|assistant|bot|ai/.test(roleStr);
+                var msg = t.message || t.text || t.content || "";
+                return '<div class="bubble ' + (isAgent ? "agent" : "user") + '"><small>' + (isAgent ? "AI Assistant" : "Patient") + '</small>' + esc(msg) + '</div>';
+            }).join("") : '<p class="noChat">No transcript saved for this call.</p>';
+            $("overlay").hidden = false;
+        }
+        function closeDetail() { $("overlay").hidden = true; }
+        $("closeBtn").addEventListener("click", closeDetail);
+        $("overlay").addEventListener("click", function (e) { if (e.target.id === "overlay") closeDetail(); });
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDetail(); });
 
         async function poll() {
             try {
@@ -368,7 +507,7 @@
             }
         }
 
-        ["q", "dir", "bk"].forEach(function (id) { $(id).addEventListener("input", render) });
+        $("q").addEventListener("input", render);
         $("refresh").addEventListener("click", poll);
         poll();
         setInterval(poll, POLL_MS);
