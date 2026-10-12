@@ -45,7 +45,17 @@ const commonNameMap = {
   "प्रीति": "Preeti",
   "राज": "Raj",
   "सोनू": "Sonu",
-  "मोनू": "Monu"
+  "मोनू": "Monu",
+  "चावला": "Chawla",
+  "गांधी": "Gandhi",
+  "सूरी": "Suri",
+  "भादुरी": "Bhaduri",
+  "अम्बवानी": "Ambwani",
+  "कपूर": "Kapoor",
+  "सौरभ": "Saurabh",
+  "उमेश": "Umesh",
+  "वर्षा": "Varsha",
+  "शुभेंदु": "Shubhendu"
 };
 
 const vowels = {

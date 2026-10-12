@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>AI Receptionist — Patient Call Records & Bookings</title>
+    <title>KMC Hospital Kanpur — AI Receptionist Call Records & Bookings</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -723,6 +723,86 @@
                 border-color: #5b21b6;
             }
         }
+
+        .hospital-header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0.8;
+        }
+
+        .stat-card.ok::after { background: var(--ok); }
+        .stat-card.warn::after { background: var(--out); }
+        .stat-card.emergency::after { background: #ef4444; }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--mute);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .stat-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--mute);
+        }
     </style>
 </head>
 
@@ -732,10 +812,13 @@
             <div class="brand-title">
                 <div class="brand-icon">🏥</div>
                 <div>
+                    <div class="hospital-header-badge">KMC Hospital • Kanpur Medical Centre</div>
                     <h1>Patient Call Records & Bookings</h1>
                     <p class="sub">
                         <span class="dot" id="dot"></span>
                         <span id="src">Connecting to live feed…</span>
+                        <span>•</span>
+                        <span>📍 120/500 Lajpat Nagar, Kanpur</span>
                     </p>
                 </div>
             </div>
@@ -744,6 +827,29 @@
                 Refresh Now
             </button>
         </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Total Calls</span>
+                <span class="stat-val" id="statCalls">0</span>
+                <span class="stat-sub">Live telephone interactions</span>
+            </div>
+            <div class="stat-card ok">
+                <span class="stat-label">Appointments Booked</span>
+                <span class="stat-val" id="statBooked">0</span>
+                <span class="stat-sub">Confirmed OPD bookings</span>
+            </div>
+            <div class="stat-card warn">
+                <span class="stat-label">Doctors on Panel</span>
+                <span class="stat-val" id="statDoctors">9</span>
+                <span class="stat-sub">Active medical specialists</span>
+            </div>
+            <div class="stat-card emergency">
+                <span class="stat-label">24x7 Emergency Line</span>
+                <span class="stat-val" style="font-size: 16px; color: #dc2626;">1800 120 3176</span>
+                <span class="stat-sub">KMC Toll-Free trauma & ICU</span>
+            </div>
+        </div>
 
         <div class="search-bar">
             <span class="search-icon">🔍</span>
@@ -780,7 +886,18 @@
                 </thead>
                 <tbody id="body"></tbody>
             </table>
-            <div class="empty" id="empty" hidden>No matching patient records found.</div>
+            <div class="empty" id="empty" hidden>
+                <div style="font-size: 40px; margin-bottom: 8px;">🏥</div>
+                <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px; color: var(--ink);">KMC AI Receptionist Ready for Live Calls</div>
+                <div style="color: var(--mute); font-size: 13px; max-width: 480px; margin: 0 auto 14px;">Database cleared for demo presentation. Live caller records, real-time speech transcripts, and booked doctor appointments will appear here automatically.</div>
+                <div style="display: inline-flex; gap: 12px; font-size: 12px; background: var(--card-subtle); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--line);">
+                    <span>👨‍⚕️ 9 Specialist Doctors</span>
+                    <span>•</span>
+                    <span>🕒 3 Daily Shifts</span>
+                    <span>•</span>
+                    <span>🚑 24x7 Emergency (1800 120 3176)</span>
+                </div>
+            </div>
             <div class="err" id="errbox" hidden></div>
         </div>
     </main>
@@ -878,92 +995,134 @@
             return name.slice(0, 2).toUpperCase();
         }
 
+        var KMC_PANEL_DOCTORS = [
+            "Dr. H.S. Chawla",
+            "Dr. Gaurav Chawla",
+            "Dr. Saurabh Chawla",
+            "Dr. Rashmi Suri",
+            "Dr. C.S. Gandhi",
+            "Dr. Shubhendu Bhaduri",
+            "Dr. Varsha Ambwani",
+            "Dr. A.K. Verma",
+            "Dr. Umesh Kapoor"
+        ];
+
         var DEPT_PATTERNS = [
             {
-                name: "General Physician",
+                name: "General Medicine",
                 icon: "🩺",
-                concern: "Fever, Cold, Cough & Infection",
-                keywords: ["fever", "bukhar", "बुखार", "cold", "jukam", "जुकाम", "cough", "khansi", "खांसी", "headache", "sirdard", "सिरदर्द", "weakness", "kamzori", "कमजोरी", "vomiting", "ulti", "उल्टी", "pet dard", "पेट दर्द", "loose motion", "dast", "दस्त", "sugar", "शुगर", "bp", "बीपी", "viral", "flu", "physician", "fizisiyan", "दवाई", "tabiyat", "तबीयत", "doctor"]
+                concern: "Fever, Weakness, Infection & Routine Care",
+                keywords: ["fever", "bukhar", "बुखार", "cold", "jukam", "जुकाम", "cough", "khansi", "खांसी", "headache", "sirdard", "सिरदर्द", "weakness", "kamzori", "कमजोरी", "vomiting", "ulti", "उल्टी", "pet dard", "पेट दर्द", "loose motion", "dast", "दस्त", "sugar", "शुगर", "bp", "बीपी", "viral", "flu", "physician", "fizisiyan", "दवाई", "tabiyat", "तबीयत", "doctor", "medicine", "chawla"]
             },
             {
-                name: "Orthopedic",
+                name: "Gastroenterology",
+                icon: "🧪",
+                concern: "Digestive, Acidity, Liver & Stomach Care",
+                keywords: ["gastro", "गैस्ट्रो", "gas", "गैस", "acidity", "एसिडिटी", "kabz", "कब्ज", "constipation", "liver", "लिवर", "peeliya", "पीलिया", "jaundice", "apach", "अपच", "endoscopy", "एंडोस्कोपी", "stomach", "hepatitis", "हेपेटाइटिस", "gaurav"]
+            },
+            {
+                name: "Orthopedics & Spine",
                 icon: "🦴",
-                concern: "Bone, Joint & Back Pain",
-                keywords: ["bone", "fracture", "joint", "जोड़ों", "knee", "ghutna", "घुटने", "back pain", "kamar dard", "कमर दर्द", "arthritis", "gathiya", "गठिया", "moch", "मोच", "haddi", "हड्डी", "neck pain", "ortho"]
+                concern: "Bone, Joint, Spine & Fracture Care",
+                keywords: ["bone", "fracture", "joint", "जोड़ों", "knee", "ghutna", "घुटने", "back pain", "kamar dard", "कमर दर्द", "arthritis", "gathiya", "गठिया", "moch", "मोच", "haddi", "हड्डी", "neck pain", "ortho", "spine", "रीढ़", "sciatica", "saurabh"]
             },
             {
-                name: "Cardiologist",
-                icon: "❤️",
-                concern: "Heart & Chest Discomfort",
-                keywords: ["heart", "दिल", "chest pain", "सीने में दर्द", "cardiac", "high bp", "धड़कन", "sans phoolna", "सांस फूलना", "palpitation"]
-            },
-            {
-                name: "Pediatrician",
-                icon: "👶",
-                concern: "Child Care & Pediatric",
-                keywords: ["child", "बच्च", "baby", "infant", "pediatric", "टीकाकरण", "vaccination", "kids"]
-            },
-            {
-                name: "Gynecologist",
+                name: "Gynecology & Maternity",
                 icon: "🌸",
-                concern: "Women's Health & Maternity",
-                keywords: ["pregnancy", "प्रेगनेंसी", "period", "पीरियड", "pcod", "pcos", "mahila", "महिला", "gynae", "गाइनी"]
+                concern: "Women's Health, Pregnancy & PCOD Care",
+                keywords: ["pregnancy", "प्रेगनेंसी", "period", "पीरियड", "pcod", "pcos", "mahila", "महिला", "gynae", "गाइनी", "स्त्री", "delivery", "डिलीवरी", "garbhavastha", "गर्भावस्था", "infertility", "rashmi", "suri"]
             },
             {
-                name: "ENT Specialist",
-                icon: "👂",
-                concern: "Ear, Nose & Throat",
-                keywords: ["ear", "कान", "nose", "नाक", "throat", "गला", "sinus", "साइनस", "tonsil", "टॉन्सिल", "hearing"]
+                name: "Pediatrics & Child Care",
+                icon: "👶",
+                concern: "Child Health, Infants & Vaccination",
+                keywords: ["child", "बच्च", "baby", "infant", "pediatric", "टीकाकरण", "vaccination", "kids", "shishu", "शिशु", "newborn", "gandhi"]
             },
             {
-                name: "Real Estate & Housing",
-                icon: "🏢",
-                concern: "Apartment & Property Inquiry",
-                keywords: ["flat", "फ्लैट", "bhk", "villa", "विला", "plot", "प्लॉट", "property", "प्रॉपर्टी", "apartment", "residency", "site visit", "विज़िट", "rent", "buy", "residential"]
+                name: "Urology & Kidney",
+                icon: "💧",
+                concern: "Kidney Stones, Urine & Prostate Care",
+                keywords: ["urology", "यूरोलॉजी", "pathri", "पथरी", "stone", "kidney", "किडनी", "urine", "पेशाब", "prostate", "प्रोस्टेट", "uti", "bhaduri", "shubhendu"]
+            },
+            {
+                name: "Neurology & Brain",
+                icon: "🧠",
+                concern: "Migraine, Brain, Nerves & Paralysis",
+                keywords: ["neuro", "न्यूरो", "brain", "दिमाग", "migraine", "माइग्रेन", "chakkar", "चक्कर", "vertigo", "seizure", "mirgi", "मिर्गी", "paralysis", "lakwa", "लकवा", "nerve", "नस", "ambwani", "varsha"]
+            },
+            {
+                name: "Pulmonology & Chest",
+                icon: "🫁",
+                concern: "Asthma, Chronic Cough & Lungs Care",
+                keywords: ["pulmo", "पल्मो", "chest", "चेस्ट", "asthma", "दमा", "lungs", "फेफड़े", "saans", "सांस", "breath", "tb", "टीबी", "khansi", "allergy", "verma"]
+            },
+            {
+                name: "Dermatology & Skin",
+                icon: "✨",
+                concern: "Skin, Hair, Acne & Allergy Care",
+                keywords: ["skin", "स्किन", "derma", "डर्मा", "khujli", "खुजली", "daad", "दाद", "acne", "pimples", "मुँहासे", "hair fall", "बाल", "charm", "चर्म", "kapoor", "umesh"]
             }
         ];
 
         function getPatientDepartment(c) {
             // 1. Direct doctor mapping if known
             var docLower = (c.doctor_name || "").toLowerCase();
-            if (docLower.includes("ananya")) {
-                return { name: "General Physician", icon: "🩺", concern: "General Medical Consultation" };
+            if (docLower.includes("h.s. chawla") || docLower.includes("hs chawla") || docLower.includes("physician")) {
+                return { name: "General Medicine", icon: "🩺", concern: "General Medical Care & Routine Checkup" };
             }
-            if (docLower.includes("sanjay")) {
-                return { name: "Orthopedic", icon: "🦴", concern: "Bone & Joint Care" };
+            if (docLower.includes("gaurav")) {
+                return { name: "Gastroenterology", icon: "🧪", concern: "Digestive, Acidity & Liver Care" };
             }
-            if (docLower.includes("rohit")) {
-                return { name: "Cardiologist", icon: "❤️", concern: "Heart Care" };
+            if (docLower.includes("saurabh")) {
+                return { name: "Orthopedics & Spine", icon: "🦴", concern: "Bone, Joint & Spine Care" };
             }
-            if (docLower.includes("priya")) {
-                return { name: "Pediatrician", icon: "👶", concern: "Child Care" };
+            if (docLower.includes("rashmi") || docLower.includes("suri")) {
+                return { name: "Gynecology & Maternity", icon: "🌸", concern: "Women's Health & Pregnancy" };
             }
-            if (docLower.includes("kavita")) {
-                return { name: "Gynecologist", icon: "🌸", concern: "Women's Health" };
+            if (docLower.includes("gandhi")) {
+                return { name: "Pediatrics & Child Care", icon: "👶", concern: "Child Health & Vaccination" };
             }
-            if (docLower.includes("rajesh")) {
-                return { name: "ENT Specialist", icon: "👂", concern: "Ear, Nose & Throat" };
+            if (docLower.includes("shubhendu") || docLower.includes("bhaduri")) {
+                return { name: "Urology & Kidney", icon: "💧", concern: "Kidney Stones & Urinary Care" };
             }
-            if (docLower.includes("city greens") || docLower.includes("residency")) {
-                return { name: "Real Estate & Housing", icon: "🏢", concern: "Apartment & Property Booking" };
+            if (docLower.includes("varsha") || docLower.includes("ambwani")) {
+                return { name: "Neurology & Brain", icon: "🧠", concern: "Brain, Nerves & Migraine Care" };
+            }
+            if (docLower.includes("verma") || docLower.includes("ak verma") || docLower.includes("a.k. verma")) {
+                return { name: "Pulmonology & Chest", icon: "🫁", concern: "Lungs & Respiratory Care" };
+            }
+            if (docLower.includes("umesh") || docLower.includes("kapoor")) {
+                return { name: "Dermatology & Skin", icon: "✨", concern: "Skin, Hair & Allergy Care" };
             }
 
             // 2. Direct department field if set
             var deptLower = (c.department || "").toLowerCase();
-            if (deptLower.includes("physician") || deptLower.includes("general")) {
-                return { name: "General Physician", icon: "🩺", concern: "Fever, Cold & General Care" };
+            if (deptLower.includes("physician") || deptLower.includes("general") || deptLower.includes("medicine")) {
+                return { name: "General Medicine", icon: "🩺", concern: "General Medical Care" };
             }
-            if (deptLower.includes("ortho")) {
-                return { name: "Orthopedic", icon: "🦴", concern: "Bone & Joint Consultation" };
+            if (deptLower.includes("gastro") || deptLower.includes("liver")) {
+                return { name: "Gastroenterology", icon: "🧪", concern: "Digestive & Liver Care" };
             }
-            if (deptLower.includes("cardio")) {
-                return { name: "Cardiologist", icon: "❤️", concern: "Cardiology" };
+            if (deptLower.includes("ortho") || deptLower.includes("bone")) {
+                return { name: "Orthopedics & Spine", icon: "🦴", concern: "Bone & Joint Care" };
             }
-            if (deptLower.includes("pediatric")) {
-                return { name: "Pediatrician", icon: "👶", concern: "Pediatrics" };
+            if (deptLower.includes("gyn") || deptLower.includes("women") || deptLower.includes("maternity")) {
+                return { name: "Gynecology & Maternity", icon: "🌸", concern: "Women's Health" };
             }
-            if (deptLower.includes("apart") || deptLower.includes("resident") || deptLower.includes("real estate")) {
-                return { name: "Real Estate & Housing", icon: "🏢", concern: "Property Booking" };
+            if (deptLower.includes("pediatric") || deptLower.includes("child")) {
+                return { name: "Pediatrics & Child Care", icon: "👶", concern: "Child Health" };
+            }
+            if (deptLower.includes("uro") || deptLower.includes("kidney") || deptLower.includes("stone")) {
+                return { name: "Urology & Kidney", icon: "💧", concern: "Urology & Kidney Care" };
+            }
+            if (deptLower.includes("neuro") || deptLower.includes("brain")) {
+                return { name: "Neurology & Brain", icon: "🧠", concern: "Neurology Care" };
+            }
+            if (deptLower.includes("pulmo") || deptLower.includes("chest") || deptLower.includes("respiratory")) {
+                return { name: "Pulmonology & Chest", icon: "🫁", concern: "Chest & Respiratory Care" };
+            }
+            if (deptLower.includes("derma") || deptLower.includes("skin")) {
+                return { name: "Dermatology & Skin", icon: "✨", concern: "Dermatology & Skin Care" };
             }
 
             // 3. Scan notes, reason, and transcript
@@ -979,7 +1138,7 @@
                 }
             }
 
-            return { name: "General Consultation", icon: "📋", concern: "General Medical Inquiry" };
+            return { name: "General Medicine", icon: "🩺", concern: "General Medical Care" };
         }
 
         function cleanPhone(p) {
@@ -1020,6 +1179,10 @@
             var deptsSet = new Set();
             var docsSet = new Set();
 
+            // Seed with all official KMC Hospital departments and doctors
+            DEPT_PATTERNS.forEach(function (dp) { deptsSet.add(dp.name); });
+            KMC_PANEL_DOCTORS.forEach(function (doc) { docsSet.add(doc); });
+
             calls.forEach(function (c) {
                 var d = getPatientDepartment(c);
                 if (d && d.name) deptsSet.add(d.name);
@@ -1030,6 +1193,11 @@
                 }
                 if (doc && doc !== "—") docsSet.add(doc);
             });
+
+            // Update stats cards
+            if ($("statCalls")) $("statCalls").textContent = calls.length;
+            if ($("statBooked")) $("statBooked").textContent = calls.filter(function (x) { return x.booked === "yes"; }).length;
+            if ($("statDoctors")) $("statDoctors").textContent = docsSet.size;
 
             // Populate Dept dropdown
             var deptOptions = '<option value="">All Departments (' + deptsSet.size + ')</option>';
