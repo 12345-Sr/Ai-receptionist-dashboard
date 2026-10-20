@@ -1906,9 +1906,9 @@
         <div class="overview-controls">
           <div class="section-title">Operational Summary</div>
           <div class="date-filter-group">
-            <button class="date-filter-btn active" data-range="today" onclick="setOverviewRange('today')">Today</button>
+            <button class="date-filter-btn" data-range="today" onclick="setOverviewRange('today')">Today</button>
             <button class="date-filter-btn" data-range="7d" onclick="setOverviewRange('7d')">7 Days</button>
-            <button class="date-filter-btn" data-range="all" onclick="setOverviewRange('all')">All</button>
+            <button class="date-filter-btn active" data-range="all" onclick="setOverviewRange('all')">All</button>
           </div>
         </div>
 
@@ -2359,7 +2359,7 @@
     // State Management
     let currentUser = null;
     let allCalls = [];
-    let overviewRange = 'today';
+    let overviewRange = 'all';
     let pollIntervalId = null;
     let selectedCall = null;
 
@@ -2709,7 +2709,19 @@
       const maxDoctorBookings = Math.max(...doctorEntries.map(e => e[1]), 1);
 
       if (doctorEntries.length === 0) {
-        doctorBars.innerHTML = '<div style="font-size:13px; color:var(--text-soft); padding:12px 0;">No bookings recorded for this timeframe.</div>';
+        if (allCalls.length > 0 && filtered.length === 0) {
+          doctorBars.innerHTML = `
+            <div style="font-size:13px; color:var(--text-soft); padding:16px; background:var(--surface-subtle); border-radius:var(--radius-sm); text-align:center;">
+              No calls logged for <strong>${overviewRange === 'today' ? 'Today' : 'this period'}</strong>.<br>
+              <span style="font-size:12px; color:var(--text-muted);">Database has ${allCalls.length} call(s) from earlier dates.</span><br>
+              <button type="button" class="demo-chip" style="margin-top:10px; font-size:12px; font-weight:700; background:var(--teal-subtle); color:var(--teal-primary); border-color:var(--teal-primary); cursor:pointer;" onclick="setOverviewRange('all')">
+                👉 Click to View All (${allCalls.length} Calls)
+              </button>
+            </div>
+          `;
+        } else {
+          doctorBars.innerHTML = '<div style="font-size:13px; color:var(--text-soft); padding:12px 0;">No bookings recorded for this timeframe.</div>';
+        }
       } else {
         doctorEntries.forEach(([docName, count]) => {
           const pct = Math.round((count / maxDoctorBookings) * 100);
