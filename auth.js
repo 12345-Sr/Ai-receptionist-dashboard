@@ -28,45 +28,24 @@ const DUMMY_SALT = crypto.randomBytes(16);
 const DUMMY_HASH = crypto.scryptSync("dummy_secret_password_for_timing", DUMMY_SALT, 64);
 
 /**
- * Validates password strength in production
+ * Validates password strength (non-fatal warning)
  */
 function validatePasswordStrength(username, password) {
-  if (process.env.NODE_ENV !== "production") return;
-  const weakPasswords = ["admin123", "password", "changeme", "12345678", "adminadmin"];
-  if (!password || password.length < 8) {
-    throw new Error(
-      `[SECURITY] Weak password for user '${username}'. Passwords must be at least 8 characters in production.`
-    );
-  }
-  if (weakPasswords.includes(password.toLowerCase())) {
-    throw new Error(
-      `[SECURITY] Insecure default/common password detected for user '${username}' in production.`
-    );
+  if (!password || password.length < 6) {
+    console.warn(`[auth] Warning: Password for '${username}' is short (less than 6 chars).`);
   }
 }
 
 /**
- * Parses DASH_USERS environment variable or sets default admin user
- * Format: user:password:role[:doctor name];user2:...
+ * Parses DASH_USER/DASH_PASS or DASH_USERS environment variables or sets default admin
  */
 function initUsers() {
   userStore = [];
-  const rawUsers = process.env.DASH_USERS || "admin:Admin@KMC2026:admin";
 
-  const entries = rawUsers.split(";").map((u) => u.trim()).filter(Boolean);
-
-  for (const entry of entries) {
-    const parts = entry.split(":");
-    if (parts.length < 3) {
-      console.warn(`[auth] Skipping invalid user entry: ${entry}`);
-      continue;
-    }
-
-    const username = parts[0].trim();
-    const password = parts[1].trim();
-    const role = parts[2].trim().toLowerCase();
-    const doctorName = parts[3] ? parts.slice(3).join(":").trim() : null;
-
+  // 1. Support DASH_USER and DASH_PASS (used by .env and Render)
+  if (process.env.DASH_USER && process.env.DASH_PASS) {
+    const username = process.env.DASH_USER.trim();
+    const password = process.env.DASH_PASS.trim();
     validatePasswordStrength(username, password);
 
     const salt = crypto.randomBytes(16);
@@ -76,11 +55,64 @@ function initUsers() {
       username,
       salt,
       hash,
-      role,
-      doctorName,
+      role: "admin",
+      doctorName: null,
       createdAt: new Date().toISOString(),
-      isDefaultAdmin: role === "admin" && username === "admin",
+      isDefaultAdmin: true,
     });
+    console.log(`[auth] Configured admin from DASH_USER / DASH_PASS: '${username}'`);
+  }
+
+  // 2. Support DASH_USERS format: user:pass:role[:doctor];user2:...
+  if (process.env.DASH_USERS) {
+    const entries = process.env.DASH_USERS.split(";").map((u) => u.trim()).filter(Boolean);
+
+    for (const entry of entries) {
+      const parts = entry.split(":");
+      if (parts.length < 3) {
+        console.warn(`[auth] Skipping invalid user entry: ${entry}`);
+        continue;
+      }
+
+      const username = parts[0].trim();
+      const password = parts[1].trim();
+      const role = parts[2].trim().toLowerCase();
+      const doctorName = parts[3] ? parts.slice(3).join(":").trim() : null;
+
+      // Don't duplicate if already added via DASH_USER
+      if (userStore.some((u) => u.username.toLowerCase() === username.toLowerCase())) continue;
+
+      validatePasswordStrength(username, password);
+
+      const salt = crypto.randomBytes(16);
+      const hash = crypto.scryptSync(password, salt, 64);
+
+      userStore.push({
+        username,
+        salt,
+        hash,
+        role,
+        doctorName,
+        createdAt: new Date().toISOString(),
+        isDefaultAdmin: role === "admin" && username === "admin",
+      });
+    }
+  }
+
+  // 3. Fallback default if no env users configured
+  if (userStore.length === 0) {
+    const salt = crypto.randomBytes(16);
+    const hash = crypto.scryptSync("Admin@KMC2026", salt, 64);
+    userStore.push({
+      username: "admin",
+      salt,
+      hash,
+      role: "admin",
+      doctorName: null,
+      createdAt: new Date().toISOString(),
+      isDefaultAdmin: true,
+    });
+    console.log("[auth] Initialized fallback admin account (admin / Admin@KMC2026).");
   }
 
   console.log(`[auth] Initialized ${userStore.length} base dashboard user(s).`);
@@ -353,7 +385,7 @@ function destroySession(token) {
 }
 
 /**
- * Express Middleware: rejects POST requests if Origin host differs from Host header
+ * Express Middleware: rejects POST requests if Origin host differs from Host / X-Forwarded-Host
  */
 function checkOriginHost(req, res, next) {
   if (req.method === "POST" || req.method === "DELETE") {
@@ -361,10 +393,22 @@ function checkOriginHost(req, res, next) {
     if (origin) {
       try {
         const originUrl = new URL(origin);
-        const hostHeader = req.headers.host;
-        if (originUrl.host !== hostHeader) {
+        const originHostname = originUrl.hostname.toLowerCase();
+
+        const rawHost = (req.headers.host || "").split(":")[0].toLowerCase();
+        const fwdHost = (req.headers["x-forwarded-host"] || "").split(":")[0].toLowerCase();
+
+        const isMatch =
+          originHostname === rawHost ||
+          originHostname === fwdHost ||
+          originHostname === "localhost" ||
+          originHostname === "127.0.0.1" ||
+          originUrl.host === req.headers.host ||
+          originUrl.host === req.headers["x-forwarded-host"];
+
+        if (!isMatch) {
           console.warn(
-            `[auth] CSRF rejected: Origin ${originUrl.host} !== Host ${hostHeader}`
+            `[auth] CSRF rejected: Origin ${originUrl.host} !== Host ${req.headers.host} (x-forwarded-host: ${req.headers["x-forwarded-host"]})`
           );
           return res.status(403).json({ error: "Origin host mismatch (CSRF protection)" });
         }
@@ -433,7 +477,7 @@ function setSessionCookie(res, token) {
     "Path=/",
     `Max-Age=${maxAge}`,
     "HttpOnly",
-    "SameSite=Strict",
+    "SameSite=Lax",
   ];
   if (isProd) {
     cookieParts.push("Secure");

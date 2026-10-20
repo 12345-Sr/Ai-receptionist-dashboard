@@ -21,6 +21,10 @@ services:
         value: calllogs
       - key: DASH_USERS
         sync: false
+      - key: DASH_USER
+        sync: false
+      - key: DASH_PASS
+        sync: false
       - key: RECORDING_HOSTS
         value: 
       - key: RECORDING_AUTH

@@ -47,6 +47,7 @@ const RECORDING_AUTH = process.env.RECORDING_AUTH || null;
 initUsers();
 
 const app = express();
+app.set("trust proxy", 1);
 
 // Middleware
 app.use(express.json({ limit: "2mb" }));
