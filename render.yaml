@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ai-reception-dashboard
+    name: kmc-hospital-ai-reception-dashboard
     runtime: node
     plan: free
     region: oregon
@@ -11,15 +11,17 @@ services:
         value: production
       - key: PORT
         value: 10000
-      - key: BACKEND_API_URL
-        sync: false
-      - key: BACKEND_API_KEY
-        sync: false
+      - key: DEMO_MODE
+        value: false
       - key: MONGODB_URI
         sync: false
       - key: DB_NAME
         value: ai_receptionist
-      - key: DASH_USER
-        value: admin
-      - key: DASH_PASS
-        value: admin123
+      - key: COLLECTION_NAME
+        value: calllogs
+      - key: DASH_USERS
+        sync: false
+      - key: RECORDING_HOSTS
+        value: 
+      - key: RECORDING_AUTH
+        sync: false

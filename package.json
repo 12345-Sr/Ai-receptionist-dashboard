@@ -1,10 +1,11 @@
 {
-  "name": "voice-agent-dashboard",
+  "name": "kmc-hospital-ai-reception-dashboard",
   "version": "1.0.0",
-  "description": "Live dashboard for voice agent call history and appointment bookings, backed by MongoDB.",
+  "description": "Role-based AI phone receptionist admin dashboard for KMC Hospital, Kanpur.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "echo \"Live mode active\""
   },
   "dependencies": {
     "dotenv": "^16.4.5",
